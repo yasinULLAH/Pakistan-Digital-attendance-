@@ -230,3 +230,20 @@ This software is free to use, modify and distribute
 
 مصنف: یاسین اللہ - پاکستان
 Author: Yasin Ullah - Pakistani
+```
+
+## ⭐ پسند آیا؟ | Like it?
+
+اگر یہ پروجیکٹ آپ کے کام آیا تو ⭐ **ستارہ** ضرور دیں!
+
+If this project helped you, please give it a ⭐ **Star**!
+
+---
+
+<div align="center">
+
+**🙏 شکریہ | Thank You**
+
+**💝 اردو تعلیم کو آسان بنانے کے لیے | Making Urdu Education Easier**
+
+</div>
