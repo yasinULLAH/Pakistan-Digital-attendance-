@@ -1,0 +1,3254 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رجسٹر حاضری و نمبرات طلباء</title>
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --table-header-bg: #e9ecef;
+            --table-row-hover-bg: #f1f3f5;
+            --input-bg: #fff;
+            --input-border: #ced4da;
+            --card-bg: #fff;
+            --modal-bg: #fff;
+            --button-text-color: #fff;
+
+            --font-family-urdu: 'Noto Naskh Arabic', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Arial', sans-serif;
+            --font-family-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            
+            --font-size-base: 1rem; /* 16px */
+            --font-size-sm: 0.875rem;
+            --font-size-lg: 1.25rem;
+
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+
+            --border-radius: 0.25rem;
+            --box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #212529; /* Darker gray */
+            --text-color: #f8f9fa; /* Light gray / white */
+            --border-color: #495057; /* Lighter gray for borders in dark mode */
+            --table-header-bg: #343a40; /* Dark gray for table headers */
+            --table-row-hover-bg: #495057;
+            --input-bg: #343a40;
+            --input-border: #6c757d;
+            --card-bg: #343a40;
+            --modal-bg: #343a40;
+            --primary-color: #0d6efd; /* Bootstrap 5 dark theme primary */
+            --primary-hover-color: #0b5ed7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family-urdu);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            font-size: var(--font-size-base);
+            transition: background-color 0.3s, color 0.3s;
+            padding: var(--spacing-md);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: var(--spacing-md);
+        }
+
+        button, input, select, textarea {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 1.2rem !important;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+        
+        input[type="text"], input[type="number"], input[type="date"], input[type="month"], select, textarea {
+            width: 100%;
+            margin-bottom: var(--spacing-sm);
+        }
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: var(--spacing-sm);
+            vertical-align: middle;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: var(--button-text-color);
+            border-color: var(--primary-color);
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        button:hover {
+            background-color: var(--primary-hover-color);
+            border-color: var(--primary-hover-color);
+        }
+        button.secondary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        button.secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+        button.danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        button.danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+        button.sm {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            font-size: var(--font-size-sm);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: var(--spacing-md);
+            background-color: var(--card-bg);
+            box-shadow: var(--box-shadow);
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: var(--spacing-sm);
+            text-align: right; /* RTL default */
+            vertical-align: middle;
+        }
+        th {
+            background-color: var(--table-header-bg);
+            font-weight: bold;
+        }
+        tbody tr:hover {
+            background-color: var(--table-row-hover-bg);
+        }
+        td input[type="text"], td input[type="number"] {
+            padding: var(--spacing-xs);
+            margin-bottom: 0;
+            font-size: var(--font-size-sm);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--box-shadow);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .tab-button {
+            padding: var(--spacing-sm) var(--spacing-md);
+            cursor: pointer;
+            border: none;
+            background-color: #8c8cc1;
+            color: var(--text-color);
+            border-bottom: 3px solid #27ff00c2; /* Default inactive tab color */
+            margin-left: var(--spacing-xs); /* For RTL, use margin-left */
+        }
+        .tab-button.active {
+            border-bottom-color: var(--primary-color);
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: var(--modal-bg);
+            margin: 10% auto; /* 10% from the top and centered */
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 600px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+            position: relative;
+        }
+        .modal-header {
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: var(--spacing-md);
+        }
+        .modal-header h2 { margin-bottom: 0; }
+        .modal-footer {
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+            margin-top: var(--spacing-md);
+            text-align: left; /* For buttons on the left in RTL */
+        }
+        .modal-footer button { margin-right: var(--spacing-sm); } /* For RTL, use margin-right */
+        .close-button {
+            color: var(--secondary-color);
+            float: left; /* For RTL, float left */
+            font-size: 28px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .close-button:hover, .close-button:focus {
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .text-center { text-align: center !important; }
+        .text-left { text-align: left !important; } /* For RTL, this is actually "left" relative to text direction */
+        .text-right { text-align: right !important; } /* For RTL, this is "right" relative to text direction */
+        .mt-1 { margin-top: var(--spacing-sm); }
+        .mb-1 { margin-bottom: var(--spacing-sm); }
+        .mr-1 { margin-right: var(--spacing-sm); } /* In RTL, this is space on the "start" side */
+        .ml-1 { margin-left: var(--spacing-sm); } /* In RTL, this is space on the "end" side */
+        .d-flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .align-items-center { align-items: center; }
+        .form-group { margin-bottom: var(--spacing-md); }
+        .form-group label { display: block; margin-bottom: var(--spacing-xs); font-weight: 500; }
+
+        /* Register Header Specific */
+        #register-header-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+        }
+        #register-header-info .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        #register-header-info .info-item strong { font-size: var(--font-size-sm); color: var(--secondary-color); }
+        #school-logo-preview { max-width: 100px; max-height: 100px; margin-top: var(--spacing-sm); }
+
+        /* Attendance Grid */
+        .attendance-table th, .attendance-table td {
+            min-width: 40px; /* Ensure day columns are not too narrow */
+            text-align: center; /* Center P/A/L */
+            padding: var(--spacing-xs);
+        }
+        .attendance-table td { cursor: pointer; }
+        .attendance-P { background-color: #d4edda; color: #155724; } /* Present */
+        .attendance-A { background-color: #f8d7da; color: #721c24; } /* Absent */
+        .attendance-L { background-color: #fff3cd; color: #856404; } /* Leave */
+        .attendance-H { background-color: #d1ecf1; color: #0c5460; } /* Holiday */
+        .attendance-X { background-color: #e2e3e5; color: #383d41; } /* Not Marked / Cleared */
+        .low-attendance { background-color: var(--warning-color) !important; color: black !important; }
+        
+        /* Marks Table */
+        .marks-table .failing-mark { background-color: #f8d7da; color: #721c24; }
+
+        /* Context Menu */
+        #context-menu {
+            position: absolute;
+            z-index: 1001;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-sm) 0;
+            min-width: 150px;
+        }
+        #context-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #context-menu ul li {
+            padding: var(--spacing-sm) var(--spacing-md);
+            cursor: pointer;
+        }
+        #context-menu ul li:hover {
+            background-color: var(--table-row-hover-bg);
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background-color: #fff;
+                color: #000;
+                font-size: 10pt;
+                padding: 0;
+                margin: 0;
+            }
+            :root { /* Override CSS vars for printing */
+                --bg-color: #fff;
+                --text-color: #000;
+                --border-color: #ccc;
+                --table-header-bg: #eee;
+                --card-bg: #fff;
+            }
+            #app-controls, .no-print, .modal, #context-menu, #theme-toggle-button, #register-management-section button, #main-nav {
+                display: none !important;
+            }
+            .card, table, #register-header-info {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+            .tabs, .tab-button { display: none; }
+            .tab-content.active { display: block !important; } /* Ensure active content is printed */
+            .tab-content { display: none; } /* Hide inactive tabs */
+            /* Ensure all relevant sections are shown if a "print all" is triggered */
+            #print-content .tab-content { display: block !important; }
+
+            .attendance-P { background-color: #e9f5e9 !important; color: #000 !important; } 
+            .attendance-A { background-color: #fbe9e9 !important; color: #000 !important; } 
+            .attendance-L { background-color: #fff8e9 !important; color: #000 !important; }
+            .attendance-H { background-color: #e9f8fb !important; color: #000 !important; }
+            .attendance-X { background-color: #f5f5f5 !important; color: #000 !important; }
+            .failing-mark { background-color: #fbe9e9 !important; color: #000 !important; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header id="app-header" class="d-flex justify-between align-items-center mb-1 card no-print">
+            <h1 id="app-title">رجسٹر حاضری و نمبرات طلباء</h1>
+            <div>
+                <button id="manage-registers-button" class="mr-1 secondary"></button>
+                <button id="theme-toggle-button" class="secondary"></button>
+            </div>
+        </header>
+
+        <div id="register-management-section" class="card no-print hidden">
+            <h2 id="manage-registers-title"></h2>
+            <div class="d-flex mb-1">
+                <select id="register-select" class="mr-1" style="flex-grow: 1;"></select>
+                <button id="switch-register-button" class="mr-1"></button>
+                <button id="create-new-register-button" class="mr-1 success"></button>
+            </div>
+            <div id="current-register-actions" class="hidden">
+                <button id="rename-register-button" class="mr-1 secondary"></button>
+                <button id="clone-register-button" class="mr-1 secondary"></button>
+                <button id="delete-register-button" class="mr-1 danger"></button>
+                <button id="export-register-json-button" class="mr-1 info"></button>
+                <button id="export-register-html-button" class="mr-1 info"></button>
+            </div>
+             <div class="mt-1">
+                <label for="import-register-file" id="import-register-json-label"></label>
+                <input type="file" id="import-register-file" accept=".json" class="mr-1">
+                <button id="import-register-button"></button>
+            </div>
+            <hr class="mt-1 mb-1">
+            <button id="reset-app-data-button" class="danger"></button>
+        </div>
+        
+        <div id="main-content" class="hidden">
+            <!-- Register Header Info -->
+            <section id="register-header-section" class="card">
+                <div class="d-flex justify-between align-items-center">
+                    <h2 id="register-header-title"></h2>
+                    <button id="edit-header-info-button" class="sm no-print"></button>
+                </div>
+                <div id="register-header-info">
+                    <div class="info-item"><strong id="lbl-school-name"></strong> <span id="info-school-name"></span></div>
+                    <div class="info-item"><strong id="lbl-class-name"></strong> <span id="info-class-name"></span></div>
+                    <div class="info-item"><strong id="lbl-section-name"></strong> <span id="info-section-name"></span></div>
+                    <div class="info-item"><strong id="lbl-teacher-name"></strong> <span id="info-teacher-name"></span></div>
+                    <div class="info-item"><strong id="lbl-academic-year"></strong> <span id="info-academic-year"></span></div>
+                    <div class="info-item">
+                        <strong id="lbl-school-logo"></strong>
+                        <img id="school-logo-preview" src="#" alt="School Logo" class="hidden"/>
+                        <span id="info-no-logo"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tabs Navigation -->
+            <nav id="main-nav" class="tabs no-print">
+                <button class="tab-button active" data-tab="students-tab" id="nav-students"></button>
+                <button class="tab-button" data-tab="attendance-tab" id="nav-attendance"></button>
+                <button class="tab-button" data-tab="marks-tab" id="nav-marks"></button>
+                <button class="tab-button" data-tab="summary-stats-tab" id="nav-summary"></button>
+                <button class="tab-button" data-tab="reports-tab" id="nav-reports"></button>
+                <button class="tab-button" data-tab="settings-tab" id="nav-settings"></button>
+            </nav>
+
+            <!-- Tab Content Area -->
+            <div id="tab-content-area">
+                <!-- Students Tab -->
+                <div id="students-tab" class="tab-content active">
+                    <div class="card">
+                        <div class="d-flex justify-between align-items-center mb-1">
+                            <h3 id="students-list-title"></h3>
+                            <button id="add-student-button"></button>
+                        </div>
+                        <div class="d-flex justify-between align-items-center mb-1">
+                            <input type="text" id="search-student-input" class="mr-1" style="flex-grow:1;">
+                            <div>
+                                <button id="undo-student-action" class="sm secondary mr-1" disabled></button>
+                                <button id="redo-student-action" class="sm secondary" disabled></button>
+                            </div>
+                        </div>
+                        <table id="students-table">
+                            <thead>
+                                <tr>
+                                    <th id="th-roll-number"></th>
+                                    <th id="th-student-name"></th>
+                                    <th id="th-father-name"></th>
+                                    <th id="th-actions" class="no-print"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body">
+                                <!-- Student rows will be populated here -->
+                            </tbody>
+                        </table>
+                        <p id="no-students-message" class="hidden"></p>
+                    </div>
+                </div>
+
+                <!-- Attendance Tab -->
+                <div id="attendance-tab" class="tab-content">
+                    <div class="card">
+                        <h3 id="attendance-register-title"></h3>
+                        <div class="d-flex justify-between align-items-center mb-1 no-print">
+                            <div>
+                                <label for="attendance-month-year" id="lbl-select-month-year"></label>
+                                <input type="month" id="attendance-month-year" class="mr-1">
+                                <label for="attendance-marking-style" id="lbl-attendance-marking-style"></label>
+                                <select id="attendance-marking-style" class="mr-1">
+                                    <option value="tick_cross" id="opt-tick-cross"></option>
+                                    <option value="ap" id="opt-ap"></option>
+                                    <option value="arrows" id="opt-arrows"></option>
+                                </select>
+                            </div>
+                            <button id="print-attendance-button" class="sm"></button>
+                        </div>
+                        <div id="bulk-attendance-actions" class="mb-1 no-print">
+                            <strong id="lbl-bulk-mark"></strong>
+                            <select id="bulk-mark-day-select" class="mr-1"></select>
+                            <select id="bulk-mark-status-select" class="mr-1">
+                                <option value="P" id="opt-mark-present"></option>
+                                <option value="A" id="opt-mark-absent"></option>
+                                <option value="L" id="opt-mark-leave"></option>
+                                <option value="H" id="opt-mark-holiday"></option>
+                                <option value="X" id="opt-mark-clear"></option>
+                            </select>
+                            <button id="apply-bulk-mark-button"></button>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table id="attendance-table" class="attendance-table">
+                                <thead id="attendance-table-head"></thead>
+                                <tbody id="attendance-table-body"></tbody>
+                            </table>
+                        </div>
+                        <p id="no-students-for-attendance" class="hidden"></p>
+                         <div class="mt-1">
+                            <h4 id="attendance-summary-title"></h4>
+                            <p><span id="lbl-total-present"></span>: <span id="stats-total-present">0</span></p>
+                            <p><span id="lbl-total-absent"></span>: <span id="stats-total-absent">0</span></p>
+                            <p><span id="lbl-total-leave"></span>: <span id="stats-total-leave">0</span></p>
+                            <p><span id="lbl-overall-attendance-percentage"></span>: <span id="stats-overall-attendance">0%</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Marks Tab -->
+                <div id="marks-tab" class="tab-content">
+                    <div class="card">
+                        <div class="d-flex justify-between align-items-center mb-1">
+                            <h3 id="marks-register-title"></h3>
+                            <button id="configure-subjects-assessments-button" class="sm no-print"></button>
+                        </div>
+                         <div class="d-flex justify-between align-items-center mb-1 no-print">
+                            <div>
+                                <label for="marks-filter-subject" id="lbl-marks-filter-subject"></label>
+                                <select id="marks-filter-subject" class="mr-1"></select>
+                                <label for="marks-filter-assessment" id="lbl-marks-filter-assessment"></label>
+                                <select id="marks-filter-assessment"></select>
+                            </div>
+                            <button id="print-marks-button" class="sm"></button>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table id="marks-table" class="marks-table">
+                                <thead id="marks-table-head"></thead>
+                                <tbody id="marks-table-body"></tbody>
+                            </table>
+                        </div>
+                        <p id="no-students-for-marks" class="hidden"></p>
+                        <p id="no-subjects-for-marks" class="hidden"></p>
+                    </div>
+                </div>
+                
+                <!-- Summary & Statistics Tab -->
+                <div id="summary-stats-tab" class="tab-content">
+                    <div class="card">
+                        <h3 id="summary-stats-title"></h3>
+                        <div id="overall-summary-content">
+                            <p id="summary-placeholder">خلاصہ اور اعداد و شمار کا سیکشن یہاں ظاہر ہوگا۔</p>
+                            <!-- Detailed summaries to be populated by JS -->
+                        </div>
+                        <button id="print-summary-button" class="sm no-print"></button>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="reports-tab" class="tab-content">
+                    <div class="card">
+                        <h3 id="reports-section-title"></h3>
+                        <div class="form-group no-print">
+                            <label for="report-type-select" id="lbl-report-type"></label>
+                            <select id="report-type-select">
+                                <option value="student_card" id="opt-student-card"></option>
+                                <option value="class_attendance_summary" id="opt-class-attendance-summary"></option>
+                                <option value="class_marks_summary" id="opt-class-marks-summary"></option>
+                            </select>
+                        </div>
+                        <div id="report-filters" class="no-print">
+                            <!-- Filters specific to report type will appear here -->
+                            <div id="student-report-filter" class="form-group hidden">
+                                <label for="report-student-select" id="lbl-report-student-select"></label>
+                                <select id="report-student-select"></select>
+                            </div>
+                             <div id="date-range-filter" class="form-group hidden d-flex">
+                                <div class="mr-1" style="flex:1">
+                                    <label for="report-start-date" id="lbl-report-start-date"></label>
+                                    <input type="date" id="report-start-date">
+                                </div>
+                                <div style="flex:1">
+                                    <label for="report-end-date" id="lbl-report-end-date"></label>
+                                    <input type="date" id="report-end-date">
+                                </div>
+                            </div>
+                        </div>
+                        <button id="generate-report-button" class="no-print"></button>
+                        <hr class="mt-1 mb-1 no-print">
+                        <div id="report-output-area">
+                            <p id="report-output-placeholder">رپورٹ یہاں ظاہر ہوگی۔</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Tab -->
+                <div id="settings-tab" class="tab-content">
+                    <div class="card">
+                        <h3 id="app-settings-title"></h3>
+                        <div class="form-group">
+                            <label for="low-attendance-threshold" id="lbl-low-attendance-threshold"></label>
+                            <input type="number" id="low-attendance-threshold" min="0" max="100" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="passing-marks-percentage" id="lbl-passing-marks-percentage"></label>
+                            <input type="number" id="passing-marks-percentage" min="0" max="100" step="1">
+                        </div>
+                        <button id="save-app-settings-button"></button>
+                    </div>
+                </div>
+
+            </div> <!-- /#tab-content-area -->
+        </div> <!-- /#main-content -->
+
+        <footer class="text-center mt-1 no-print">
+            <p>&copy; <span id="current-year-footer"></span> <span id="footer-app-name"></span>. <span id="version-info">ورژن 1.0.0</span></p>
+        </footer>
+    </div> <!-- /.container -->
+
+    <!-- Modals -->
+    <div id="generic-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-button" data-dismiss="modal">&times;</span>
+                <h2 id="modal-title"></h2>
+            </div>
+            <div id="modal-body" class="modal-body">
+            </div>
+            <div id="modal-footer" class="modal-footer">
+                <button id="modal-confirm-button"></button>
+                <button id="modal-cancel-button" data-dismiss="modal" class="secondary"></button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="form-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-button" data-dismiss="modal">&times;</span>
+                <h2 id="form-modal-title"></h2>
+            </div>
+            <div id="form-modal-body" class="modal-body">
+                <!-- Form content injected here -->
+            </div>
+            <div class="modal-footer">
+                <button id="form-modal-save-button"></button>
+                <button id="form-modal-cancel-button" data-dismiss="modal" class="secondary"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="hidden">
+        <ul></ul>
+    </div>
+
+    <!-- Print Area (hidden, for generating printable HTML) -->
+    <div id="print-content-area" class="hidden"></div>
+
+    <script>
+        "use strict";
+
+        // --- Localization Strings (Urdu) ---
+        const L = {
+            // General
+            appName: "رجسٹر حاضری و نمبرات طلباء",
+            loading: "لوڈ ہو رہا ہے...",
+            save: "محفوظ کریں",
+            cancel: "منسوخ کریں",
+            add: "شامل کریں",
+            edit: "ترمیم",
+            delete: "حذف کریں",
+            close: "بند کریں",
+            yes: "ہاں",
+            no: "نہیں",
+            confirm: "تصدیق کریں",
+            success: "کامیابی",
+            error: "خرابی",
+            warning: "انتباہ",
+            search: "تلاش کریں...",
+            filter: "فلٹر",
+            export: "برآمد کریں",
+            import: "درآمد کریں",
+            print: "پرنٹ",
+            actions: "اعمال",
+            settings: "ترتیبات",
+            details: "تفصیلات",
+            total: "کل",
+            average: "اوسط",
+            percentage: "فیصد",
+            grade: "گریڈ",
+            status: "کیفیت",
+            summary: "خلاصہ",
+            all: "تمام",
+            none: "کوئی نہیں",
+            toggleAll: "سب کو منتخب/غیر منتخب کریں",
+            copiedToClipboard: "کلپ بورڈ پر کاپی کر دیا گیا۔",
+            fieldRequired: "یہ خانہ ضروری ہے۔",
+            errorOccurred: "ایک خرابی پیش آگئی: ",
+            operationSuccessful: "آپریشن کامیاب رہا۔",
+            noDataAvailable: "کوئی ڈیٹا دستیاب نہیں۔",
+
+            // Theme
+            lightMode: "لائٹ موڈ",
+            darkMode: "ڈارک موڈ",
+
+            // Register Management
+            manageRegisters: "رجسٹروں کا انتظام",
+            createNewRegister: "نیا رجسٹر بنائیں",
+            renameRegister: "رجسٹر کا نام تبدیل کریں",
+            deleteRegister: "رجسٹر حذف کریں",
+            cloneRegister: "رجسٹر کی نقل بنائیں",
+            switchRegister: "رجسٹر تبدیل کریں",
+            backupData: "ڈیٹا کا بیک اپ لیں", // For future full app backup
+            restoreData: "ڈیٹا بحال کریں", // For future full app restore
+            exportRegisterJSON: "JSON برآمد کریں",
+            importRegisterJSON: "JSON درآمد کریں",
+            importRegisterJSONLabel: "رجسٹر JSON فائل درآمد کریں:",
+            exportRegisterHTML: "HTML برآمد کریں (پرنٹ ایبل)",
+            noRegistersFound: "کوئی رجسٹر موجود نہیں۔ نیا رجسٹر بنائیں۔",
+            confirmDeleteRegister: "کیا آپ واقعی اس رجسٹر کو حذف کرنا چاہتے ہیں؟ یہ عمل واپس نہیں لیا جا سکتا۔",
+            enterNewRegisterName: "نئے رجسٹر کا نام درج کریں:",
+            enterRegisterName: "رجسٹر کا نام درج کریں:",
+            registerName: "رجسٹر کا نام",
+            currentRegister: "موجودہ رجسٹر:",
+            selectRegisterToManage: "انتظام کرنے کے لیے رجسٹر منتخب کریں:",
+
+            // Register Header Info
+            registerHeaderInfo: "رجسٹر کی معلومات",
+            schoolInfo: "اسکول کی معلومات",
+            schoolName: "اسکول کا نام",
+            className: "کلاس",
+            sectionName: "سیکشن",
+            teacherName: "استاد کا نام",
+            academicYear: "تعلیمی سال",
+            logoURL: "لوگو کا یو آر ایل (اختیاری)",
+            schoolLogo: "اسکول کا لوگو",
+            noLogo: "کوئی لوگو نہیں",
+            updateHeaderInfo: "ہیڈر کی معلومات اپ ڈیٹ کریں",
+            editHeaderInfo: "ہیڈر کی معلومات میں ترمیم کریں",
+            month: "مہینہ",
+            year: "سال",
+            selectMonth: "مہینہ منتخب کریں",
+            selectYear: "سال منتخب کریں",
+
+            // Student Management
+            studentManagement: "طلباء کا انتظام",
+            studentsList: "طلباء کی فہرست",
+            addStudent: "طالب علم شامل کریں",
+            editStudent: "طالب علم کی ترمیم",
+            deleteStudent: "طالب علم حذف کریں",
+            reorderStudents: "طلباء کی ترتیب نو", // Simplified with sort
+            rollNumber: "رول نمبر",
+            studentName: "طالب علم کا نام",
+            fatherName: "والد کا نام",
+            noStudentsInSection: "اس سیکشن میں کوئی طالب علم نہیں۔ نیا طالب علم شامل کریں۔",
+            confirmDeleteStudent: "کیا آپ واقعی اس طالب علم کو حذف کرنا چاہتے ہیں؟",
+            moveUp: "اوپر منتقل کریں",
+            moveDown: "نیچے منتقل کریں",
+            searchStudentPlaceholder: "رول نمبر یا نام سے تلاش کریں...",
+
+            // Attendance
+            attendance: "حاضری",
+            attendanceRegister: "حاضری رجسٹر",
+            daysShort: ["پیر", "منگل", "بدھ", "جمعرات", "جمعہ", "ہفتہ", "اتوار"], // Mon to Sun
+            months: ["جنوری", "فروری", "مارچ", "اپریل", "مئی", "جون", "جولائی", "اگست", "ستمبر", "اکتوبر", "نومبر", "دسمبر"],
+            present: "حاضر",
+            absent: "غیر حاضر",
+            leave: "رخصت",
+            holiday: "چھٹی",
+            notMarked: "نشان زد نہیں",
+            markAll: "سب کو نشان زد کریں", // For bulk actions
+            bulkMarkDay: "دن کے لیے اجتماعی نشان زدگی:",
+            markAsPresent: "سب کو حاضر نشان زد کریں",
+            markAsAbsent: "سب کو غیر حاضر نشان زد کریں",
+            markAsLeave: "سب کو رخصت نشان زد کریں",
+            markAsHoliday: "سب کو چھٹی نشان زد کریں",
+            clearDay: "دن صاف کریں",
+            applyBulkMark: "لاگو کریں",
+            attendanceMarkingStyle: "حاضری کا انداز:",
+            styleTickCross: "✓ / ✗",
+            styleAP: "ح / غ",
+            styleArrows: "↑ / ↓", // Using simple text arrows for now
+            attendanceSummary: "حاضری کا خلاصہ",
+            totalPresent: "کل حاضر",
+            totalAbsent: "کل غیر حاضر",
+            totalLeave: "کل رخصت",
+            attendancePercentage: "حاضری کا فیصد",
+            overallAttendancePercentage: "مجموعی حاضری کا فیصد",
+            lowAttendanceThreshold: "کم حاضری کی حد (%)",
+            highlightLowAttendance: "کم حاضری کو نمایاں کریں",
+            noStudentsForAttendance: "حاضری کے لیے کوئی طالب علم موجود نہیں۔",
+            selectMonthYear: "مہینہ/سال منتخب کریں:",
+
+            // Marks
+            marks: "نمبرات",
+            marksRegister: "نمبرات رجسٹر",
+            marksEntry: "نمبرات کا اندراج",
+            subjects: "مضامین",
+            addSubject: "مضمون شامل کریں",
+            editSubject: "مضمون میں ترمیم کریں",
+            deleteSubject: "مضمون حذف کریں",
+            subjectName: "مضمون کا نام",
+            maxMarks: "کل نمبرات (مضمون)",
+            assessmentTypes: "امتحان کی اقسام",
+            addAssessmentType: "امتحان کی قسم شامل کریں",
+            editAssessmentType: "امتحان کی قسم میں ترمیم کریں",
+            deleteAssessmentType: "امتحان کی قسم حذف کریں",
+            assessmentName: "امتحان کا نام",
+            assessmentMaxMarks: "کل نمبرات (امتحان)",
+            obtainedMarks: "حاصل کردہ نمبرات",
+            totalMarks: "کل نمبرات",
+            marksPercentage: "نمبرات کا فیصد",
+            marksGrade: "گریڈ",
+            marksSummary: "نمبرات کا خلاصہ",
+            configureSubjectsAssessments: "مضامین اور امتحانات کی تشکیل",
+            passingMarksPercentage: "پاسنگ مارکس (%)",
+            highlightFailingMarks: "ناکام نمبرات کو نمایاں کریں",
+            gradeA_plus: "A+",
+            gradeA: "A",
+            gradeB: "B",
+            gradeC: "C",
+            gradeD: "D",
+            gradeF: "F (فیل)",
+            marksValidationErrorRange: "نمبرات {min} اور {max} کے درمیان ہونے چاہئیں۔",
+            marksValidationErrorRequired: "نمبرات درکار ہیں۔",
+            noStudentsForMarks: "نمبرات کے اندراج کے لیے کوئی طالب علم موجود نہیں۔",
+            noSubjectsForMarks: "کوئی مضامین یا امتحانات تشکیل نہیں دیے گئے۔ پہلے 'مضامین اور امتحانات کی تشکیل' کریں۔",
+            filterBySubject: "مضمون کے لحاظ سے فلٹر کریں:",
+            filterByAssessment: "امتحان کے لحاظ سے فلٹر کریں:",
+            allSubjects: "تمام مضامین",
+            allAssessments: "تمام امتحانات",
+
+            // Summaries & Statistics
+            summaryAndStatistics: "خلاصہ اور اعداد و شمار",
+            printSummary: "خلاصہ پرنٹ کریں",
+
+            // Reports
+            reports: "رپورٹس",
+            generateReport: "رپورٹ بنائیں",
+            reportType: "رپورٹ کی قسم:",
+            studentCard: "طالب علم کارڈ",
+            classAttendanceSummaryReport: "کلاس حاضری سمری رپورٹ",
+            classMarksSummaryReport: "کلاس نمبرات سمری رپورٹ",
+            selectStudentForReport: "رپورٹ کے لیے طالب علم منتخب کریں:",
+            dateRange: "تاریخ کی حد:",
+            startDate: "شروع کی تاریخ:",
+            endDate: "اختتام کی تاریخ:",
+            filterBy: "فلٹر بذریعہ", // General filter label
+            minAttendance: "کم از کم حاضری (%)",
+            minMarks: "کم از کم نمبرات (%)",
+            reportOutputPlaceholder: "رپورٹ یہاں ظاہر ہوگی۔ منتخب کردہ قسم کے مطابق فلٹرز منتخب کریں اور 'رپورٹ بنائیں' پر کلک کریں۔",
+            printReport: "رپورٹ پرنٹ کریں",
+
+            // Data Management
+            resetAppData: "تمام ایپ ڈیٹا صاف کریں",
+            confirmResetAppData: "انتباہ: یہ عمل تمام رجسٹرز اور ترتیبات کو حذف کر دے گا۔ کیا آپ واقعی آگے بڑھنا چاہتے ہیں؟ یہ عمل واپس نہیں لیا جا سکتا۔",
+            dataExportedSuccessfully: "ڈیٹا کامیابی سے برآمد ہو گیا۔ فائل کا نام: ",
+            dataImportedSuccessfully: "ڈیٹا کامیابی سے درآمد ہو گیا۔",
+            errorImportingData: "ڈیٹا درآمد کرنے میں خرابی: ",
+            errorExportingData: "ڈیٹا برآمد کرنے میں خرابی: ",
+            unsavedChanges: "آپ کے پاس غیر محفوظ شدہ تبدیلیاں ہیں۔ کیا آپ واقعی صفحہ چھوڑنا چاہتے ہیں؟",
+            unsavedChangesTitle: "غیر محفوظ شدہ تبدیلیاں",
+
+            // App Settings
+            appSettings: "ایپ کی ترتیبات",
+            saveAppSettings: "ترتیبات محفوظ کریں",
+
+            // Other
+            undo: "کالعدم",
+            redo: "دوبارہ کریں",
+            noActionsToUndo: "کالعدم کرنے کے لیے کوئی عمل نہیں۔",
+            noActionsToRedo: "دوبارہ کرنے کے لیے کوئی عمل نہیں۔",
+            help: "مدد",
+            version: "ورژن",
+            footerAppName: "رجسٹر ایپ",
+        };
+
+        // --- Constants & Config ---
+        const DB_NAME = "UrduRegisterAppDB";
+        const DB_VERSION = 1;
+        const STORE_REGISTERS_META = "registers_meta";
+        const STORE_REGISTER_DATA = "register_data";
+        const STORE_APP_SETTINGS = "app_settings";
+        const APP_SETTINGS_KEY = "default_settings";
+
+        let db;
+        let currentRegisterId = null;
+        let currentRegisterData = null; // { info: {}, students: [], attendance: {}, marks: {}, subjects: [], assessmentTypes: [] }
+        let appSettings = { // Default app settings
+            theme: "light",
+            lowAttendanceThreshold: 75,
+            passingMarksPercentage: 40,
+        };
+        let unsavedChangesExist = false;
+        
+        // Undo/Redo Stacks (Simplified: for student list operations primarily)
+        const undoStack = [];
+        const redoStack = [];
+        const MAX_UNDO_STEPS = 10;
+
+        // --- DOM Elements Cache ---
+        const $ = (selector) => document.querySelector(selector);
+        const $$ = (selector) => document.querySelectorAll(selector);
+
+        const DOM = {
+            appHeader: $("#app-header"),
+            appTitle: $("#app-title"),
+            manageRegistersButton: $("#manage-registers-button"),
+            themeToggleButton: $("#theme-toggle-button"),
+            registerManagementSection: $("#register-management-section"),
+            manageRegistersTitle: $("#manage-registers-title"),
+            registerSelect: $("#register-select"),
+            switchRegisterButton: $("#switch-register-button"),
+            createNewRegisterButton: $("#create-new-register-button"),
+            currentRegisterActions: $("#current-register-actions"),
+            renameRegisterButton: $("#rename-register-button"),
+            cloneRegisterButton: $("#clone-register-button"),
+            deleteRegisterButton: $("#delete-register-button"),
+            exportRegisterJsonButton: $("#export-register-json-button"),
+            exportRegisterHtmlButton: $("#export-register-html-button"),
+            importRegisterFile: $("#import-register-file"),
+            importRegisterLabel: $("#import-register-json-label"),
+            importRegisterButton: $("#import-register-button"),
+            resetAppDataButton: $("#reset-app-data-button"),
+            mainContent: $("#main-content"),
+            registerHeaderSection: $("#register-header-section"),
+            registerHeaderTitle: $("#register-header-title"),
+            editHeaderInfoButton: $("#edit-header-info-button"),
+            lblSchoolName: $("#lbl-school-name"), infoSchoolName: $("#info-school-name"),
+            lblClassName: $("#lbl-class-name"), infoClassName: $("#info-class-name"),
+            lblSectionName: $("#lbl-section-name"), infoSectionName: $("#info-section-name"),
+            lblTeacherName: $("#lbl-teacher-name"), infoTeacherName: $("#info-teacher-name"),
+            lblAcademicYear: $("#lbl-academic-year"), infoAcademicYear: $("#info-academic-year"),
+            lblSchoolLogo: $("#lbl-school-logo"), schoolLogoPreview: $("#school-logo-preview"), infoNoLogo: $("#info-no-logo"),
+            mainNav: $("#main-nav"),
+            tabs: $$(".tab-button"),
+            tabContents: $$(".tab-content"),
+            // Students Tab
+            navStudents: $("#nav-students"), studentsTab: $("#students-tab"), studentsListTitle: $("#students-list-title"),
+            addStudentButton: $("#add-student-button"), searchStudentInput: $("#search-student-input"),
+            undoStudentAction: $("#undo-student-action"), redoStudentAction: $("#redo-student-action"),
+            studentsTable: $("#students-table"), studentsTableBody: $("#students-table-body"),
+            thRollNumber: $("#th-roll-number"), thStudentName: $("#th-student-name"), thFatherName: $("#th-father-name"), thActions: $("#th-actions"),
+            noStudentsMessage: $("#no-students-message"),
+            // Attendance Tab
+            navAttendance: $("#nav-attendance"), attendanceTab: $("#attendance-tab"), attendanceRegisterTitle: $("#attendance-register-title"),
+            lblSelectMonthYear: $("#lbl-select-month-year"), attendanceMonthYear: $("#attendance-month-year"),
+            lblAttendanceMarkingStyle: $("#lbl-attendance-marking-style"), attendanceMarkingStyle: $("#attendance-marking-style"),
+            optTickCross: $("#opt-tick-cross"), optAP: $("#opt-ap"), optArrows: $("#opt-arrows"),
+            printAttendanceButton: $("#print-attendance-button"),
+            bulkAttendanceActions: $("#bulk-attendance-actions"), lblBulkMark: $("#lbl-bulk-mark"),
+            bulkMarkDaySelect: $("#bulk-mark-day-select"), bulkMarkStatusSelect: $("#bulk-mark-status-select"),
+            optMarkPresent: $("#opt-mark-present"), optMarkAbsent: $("#opt-mark-absent"),
+            optMarkLeave: $("#opt-mark-leave"), optMarkHoliday: $("#opt-mark-holiday"), optMarkClear: $("#opt-mark-clear"),
+            applyBulkMarkButton: $("#apply-bulk-mark-button"),
+            attendanceTable: $("#attendance-table"), attendanceTableHead: $("#attendance-table-head"), attendanceTableBody: $("#attendance-table-body"),
+            noStudentsForAttendance: $("#no-students-for-attendance"),
+            attendanceSummaryTitle: $("#attendance-summary-title"),
+            lblTotalPresent: $("#lbl-total-present"), statsTotalPresent: $("#stats-total-present"),
+            lblTotalAbsent: $("#lbl-total-absent"), statsTotalAbsent: $("#stats-total-absent"),
+            lblTotalLeave: $("#lbl-total-leave"), statsTotalLeave: $("#stats-total-leave"),
+            lblOverallAttendancePercentage: $("#lbl-overall-attendance-percentage"), statsOverallAttendance: $("#stats-overall-attendance"),
+            // Marks Tab
+            navMarks: $("#nav-marks"), marksTab: $("#marks-tab"), marksRegisterTitle: $("#marks-register-title"),
+            configureSubjectsAssessmentsButton: $("#configure-subjects-assessments-button"),
+            lblMarksFilterSubject: $("#lbl-marks-filter-subject"), marksFilterSubject: $("#marks-filter-subject"),
+            lblMarksFilterAssessment: $("#lbl-marks-filter-assessment"), marksFilterAssessment: $("#marks-filter-assessment"),
+            printMarksButton: $("#print-marks-button"),
+            marksTable: $("#marks-table"), marksTableHead: $("#marks-table-head"), marksTableBody: $("#marks-table-body"),
+            noStudentsForMarks: $("#no-students-for-marks"), noSubjectsForMarks: $("#no-subjects-for-marks"),
+            // Summary Tab
+            navSummary: $("#nav-summary"), summaryStatsTab: $("#summary-stats-tab"), summaryStatsTitle: $("#summary-stats-title"),
+            overallSummaryContent: $("#overall-summary-content"), summaryPlaceholder: $("#summary-placeholder"),
+            printSummaryButton: $("#print-summary-button"),
+            // Reports Tab
+            navReports: $("#nav-reports"), reportsTab: $("#reports-tab"), reportsSectionTitle: $("#reports-section-title"),
+            lblReportType: $("#lbl-report-type"), reportTypeSelect: $("#report-type-select"),
+            optStudentCard: $("#opt-student-card"), optClassAttendanceSummary: $("#opt-class-attendance-summary"), optClassMarksSummary: $("#opt-class-marks-summary"),
+            reportFilters: $("#report-filters"), studentReportFilter: $("#student-report-filter"),
+            lblReportStudentSelect: $("#lbl-report-student-select"), reportStudentSelect: $("#report-student-select"),
+            dateRangeFilter: $("#date-range-filter"), lblReportStartDate: $("#lbl-report-start-date"), reportStartDate: $("#report-start-date"),
+            lblReportEndDate: $("#lbl-report-end-date"), reportEndDate: $("#report-end-date"),
+            generateReportButton: $("#generate-report-button"), reportOutputArea: $("#report-output-area"), reportOutputPlaceholder: $("#report-output-placeholder"),
+            // Settings Tab
+            navSettings: $("#nav-settings"), settingsTab: $("#settings-tab"), appSettingsTitle: $("#app-settings-title"),
+            lblLowAttendanceThreshold: $("#lbl-low-attendance-threshold"), lowAttendanceThresholdInput: $("#low-attendance-threshold"),
+            lblPassingMarksPercentage: $("#lbl-passing-marks-percentage"), passingMarksPercentageInput: $("#passing-marks-percentage"),
+            saveAppSettingsButton: $("#save-app-settings-button"),
+            // Footer
+            currentYearFooter: $("#current-year-footer"), footerAppName: $("#footer-app-name"), versionInfo: $("#version-info"),
+            // Modals
+            genericModal: $("#generic-modal"), modalTitle: $("#modal-title"), modalBody: $("#modal-body"),
+            modalConfirmButton: $("#modal-confirm-button"), modalCancelButton: $("#modal-cancel-button"),
+            formModal: $("#form-modal"), formModalTitle: $("#form-modal-title"), formModalBody: $("#form-modal-body"),
+            formModalSaveButton: $("#form-modal-save-button"), formModalCancelButton: $("#form-modal-cancel-button"),
+            // Context Menu
+            contextMenu: $("#context-menu"),
+            // Print Area
+            printContentArea: $("#print-content-area"),
+        };
+
+        // --- Utility Functions ---
+        const Utils = {
+            generateUUID: () => ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)),
+            
+            formatDate: (date) => { // YYYY-MM-DD
+                if (!(date instanceof Date)) date = new Date(date);
+                return date.toISOString().split('T')[0];
+            },
+            
+            getDaysInMonth: (year, month) => new Date(year, month + 1, 0).getDate(), // month is 0-indexed
+
+            getUrduDayName: (date) => { // date is YYYY-MM-DD string or Date object
+                const d = (typeof date === 'string') ? new Date(date) : date;
+                // JS getDay(): 0 for Sunday, 1 for Monday ... 6 for Saturday
+                // Our L.daysShort is Mon to Sun
+                let dayIndex = d.getDay(); // 0 (Sun) to 6 (Sat)
+                if (dayIndex === 0) dayIndex = 6; // Sunday is last in our array
+                else dayIndex -=1; // Shift Mon-Sat to 0-5
+                return L.daysShort[dayIndex];
+            },
+
+            getUrduMonthName: (monthIndex) => L.months[monthIndex], // 0-indexed
+
+            setUnsavedChanges: (status) => {
+                unsavedChangesExist = status;
+                // console.log("Unsaved changes:", status);
+            },
+            
+            // Simple debounce function
+            debounce: (func, delay) => {
+                let timeout;
+                return function(...args) {
+                    const context = this;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), delay);
+                };
+            },
+
+            // Function to calculate grade based on percentage
+            calculateGrade: (percentage) => {
+                if (percentage >= 90) return L.gradeA_plus;
+                if (percentage >= 80) return L.gradeA;
+                if (percentage >= 70) return L.gradeB;
+                if (percentage >= 60) return L.gradeC;
+                if (percentage >= appSettings.passingMarksPercentage) return L.gradeD;
+                return L.gradeF;
+            },
+        };
+
+        // --- IndexedDB Wrapper (DBLib) ---
+        const DBLib = (() => {
+            function openDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+                    request.onerror = (event) => reject(L.error + "IndexedDB: " + event.target.errorCode);
+                    request.onsuccess = (event) => {
+                        db = event.target.result;
+                        resolve(db);
+                    };
+                    request.onupgradeneeded = (event) => {
+                        db = event.target.result;
+                        if (!db.objectStoreNames.contains(STORE_REGISTERS_META)) {
+                            db.createObjectStore(STORE_REGISTERS_META, { keyPath: "id", autoIncrement: false }); // Use UUID for id
+                        }
+                        if (!db.objectStoreNames.contains(STORE_REGISTER_DATA)) {
+                            db.createObjectStore(STORE_REGISTER_DATA, { keyPath: "id" }); // id is registerId
+                        }
+                        if (!db.objectStoreNames.contains(STORE_APP_SETTINGS)) {
+                            db.createObjectStore(STORE_APP_SETTINGS, { keyPath: "key" });
+                        }
+                    };
+                });
+            }
+
+            function getStore(storeName, mode = "readonly") {
+                if (!db) throw new Error("Database not initialized.");
+                const transaction = db.transaction(storeName, mode);
+                return transaction.objectStore(storeName);
+            }
+            
+            async function performOperation(storeName, operation, mode = "readwrite", ...args) {
+                if (!db) await openDB(); // Ensure DB is open
+                return new Promise((resolve, reject) => {
+                    try {
+                        const store = getStore(storeName, mode);
+                        const request = store[operation](...args);
+                        request.onsuccess = (event) => resolve(request.result || event.target.result);
+                        request.onerror = (event) => reject(L.error + event.target.errorCode);
+                    } catch (err) {
+                        reject(err);
+                    }
+                });
+            }
+
+            return {
+                init: openDB,
+                // Register Meta operations
+                addRegisterMeta: (meta) => performOperation(STORE_REGISTERS_META, "add", "readwrite", meta),
+                putRegisterMeta: (meta) => performOperation(STORE_REGISTERS_META, "put", "readwrite", meta),
+                getRegisterMeta: (id) => performOperation(STORE_REGISTERS_META, "get", "readonly", id),
+                getAllRegisterMetas: () => performOperation(STORE_REGISTERS_META, "getAll", "readonly"),
+                deleteRegisterMeta: (id) => performOperation(STORE_REGISTERS_META, "delete", "readwrite", id),
+                // Register Data operations
+                putRegisterData: (data) => performOperation(STORE_REGISTER_DATA, "put", "readwrite", data),
+                getRegisterData: (id) => performOperation(STORE_REGISTER_DATA, "get", "readonly", id),
+                deleteRegisterData: (id) => performOperation(STORE_REGISTER_DATA, "delete", "readwrite", id),
+                // App Settings operations
+                putAppSettings: (settings) => performOperation(STORE_APP_SETTINGS, "put", "readwrite", {...settings, key: APP_SETTINGS_KEY}),
+                getAppSettings: () => performOperation(STORE_APP_SETTINGS, "get", "readonly", APP_SETTINGS_KEY),
+                
+                // Reset all data
+                resetAllData: async () => {
+                    if (!db) await openDB();
+                    return new Promise((resolve, reject) => {
+                        const transaction = db.transaction([STORE_REGISTERS_META, STORE_REGISTER_DATA, STORE_APP_SETTINGS], "readwrite");
+                        transaction.onerror = (event) => reject(L.error + event.target.errorCode);
+                        transaction.oncomplete = () => resolve();
+                        
+                        transaction.objectStore(STORE_REGISTERS_META).clear();
+                        transaction.objectStore(STORE_REGISTER_DATA).clear();
+                        transaction.objectStore(STORE_APP_SETTINGS).clear();
+                    });
+                }
+            };
+        })();
+
+        // --- Theme Manager ---
+        const ThemeManager = (() => {
+            function applyTheme(theme) {
+                document.documentElement.setAttribute("data-theme", theme);
+                appSettings.theme = theme;
+                DOM.themeToggleButton.textContent = theme === "dark" ? L.lightMode : L.darkMode;
+            }
+
+            function toggleTheme() {
+                const newTheme = appSettings.theme === "light" ? "dark" : "light";
+                applyTheme(newTheme);
+                DBLib.putAppSettings(appSettings).catch(err => console.error("Error saving theme:", err));
+            }
+
+            function init() {
+                applyTheme(appSettings.theme); // Apply loaded or default theme
+                DOM.themeToggleButton.addEventListener("click", toggleTheme);
+            }
+            return { init, applyTheme };
+        })();
+
+        // --- Modal Manager ---
+        const ModalManager = (() => {
+            let currentConfirmCallback = null;
+            let currentFormSaveCallback = null;
+
+            function showModal(modalElement, title, bodyContent, confirmText, cancelText, onConfirm) {
+                modalElement.querySelector(".modal-header h2").textContent = title;
+                const bodyEl = modalElement.querySelector(".modal-body");
+                if (typeof bodyContent === 'string') {
+                    bodyEl.innerHTML = bodyContent;
+                } else {
+                    bodyEl.innerHTML = ''; // Clear previous content
+                    bodyEl.appendChild(bodyContent);
+                }
+
+                const confirmBtn = modalElement.querySelector(".modal-footer button:first-of-type");
+                const cancelBtn = modalElement.querySelector(".modal-footer button:last-of-type");
+
+                confirmBtn.textContent = confirmText || L.confirm;
+                cancelBtn.textContent = cancelText || L.cancel;
+
+                currentConfirmCallback = onConfirm;
+                
+                confirmBtn.style.display = onConfirm ? 'inline-block' : 'none';
+
+                modalElement.style.display = "block";
+            }
+            
+            function showGenericModal(title, message, onConfirm, confirmText = L.yes, cancelText = L.no) {
+                showModal(DOM.genericModal, title, `<p>${message}</p>`, confirmText, cancelText, onConfirm);
+            }
+
+            function showFormModal(title, formHtml, onSave, saveText = L.save, cancelText = L.cancel) {
+                DOM.formModalTitle.textContent = title;
+                DOM.formModalBody.innerHTML = formHtml;
+                DOM.formModalSaveButton.textContent = saveText;
+                DOM.formModalCancelButton.textContent = cancelText;
+                currentFormSaveCallback = onSave;
+                DOM.formModal.style.display = "block";
+            }
+
+            function hideModal(modalElement) {
+                modalElement.style.display = "none";
+                currentConfirmCallback = null;
+                currentFormSaveCallback = null;
+            }
+
+            function init() {
+                // Generic Modal buttons
+                DOM.modalConfirmButton.addEventListener("click", () => {
+                    if (currentConfirmCallback) currentConfirmCallback();
+                    hideModal(DOM.genericModal);
+                });
+                DOM.modalCancelButton.addEventListener("click", () => hideModal(DOM.genericModal));
+                $$(".close-button[data-dismiss='modal']").forEach(btn => {
+                    btn.addEventListener("click", () => hideModal(btn.closest(".modal")));
+                });
+
+                // Form Modal buttons
+                DOM.formModalSaveButton.addEventListener("click", () => {
+                    if (currentFormSaveCallback) {
+                        const form = DOM.formModalBody.querySelector("form");
+                        if (form && form.checkValidity && !form.checkValidity()) {
+                            form.reportValidity(); // Show native HTML5 validation messages
+                            return;
+                        }
+                        currentFormSaveCallback(form ? new FormData(form) : null); // Pass form data if form exists
+                    }
+                    // hideModal(DOM.formModal) will be called by the callback if successful
+                });
+                DOM.formModalCancelButton.addEventListener("click", () => hideModal(DOM.formModal));
+
+                // Close modal on escape key
+                window.addEventListener("keydown", (event) => {
+                    if (event.key === "Escape") {
+                        if (DOM.genericModal.style.display === "block") hideModal(DOM.genericModal);
+                        if (DOM.formModal.style.display === "block") hideModal(DOM.formModal);
+                    }
+                });
+                // Close modal on outside click
+                window.addEventListener("click", (event) => {
+                    if (event.target === DOM.genericModal) hideModal(DOM.genericModal);
+                    if (event.target === DOM.formModal) hideModal(DOM.formModal);
+                });
+            }
+
+            return { init, showGenericModal, showFormModal, hideModal, hideFormModal: () => hideModal(DOM.formModal) };
+        })();
+
+        // --- Context Menu Manager ---
+        const ContextMenuManager = (() => {
+            const menu = DOM.contextMenu;
+            let currentTargetElement = null;
+
+            function show(x, y, items, targetElement) {
+                currentTargetElement = targetElement;
+                menu.innerHTML = ''; // Clear previous items
+                const ul = document.createElement('ul');
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item.label;
+                    if (item.disabled) {
+                        li.classList.add('disabled');
+                        li.style.color = 'grey';
+                        li.style.cursor = 'default';
+                    } else {
+                        li.addEventListener('click', () => {
+                            item.action(currentTargetElement);
+                            hide();
+                        });
+                    }
+                    ul.appendChild(li);
+                });
+                menu.appendChild(ul);
+                
+                // Position menu, ensuring it's within viewport
+                menu.style.top = `${y}px`;
+                menu.style.right = `calc(100vw - ${x}px)`; // For RTL: position from right
+                menu.classList.remove('hidden');
+
+                const menuRect = menu.getBoundingClientRect();
+                if (menuRect.bottom > window.innerHeight) {
+                    menu.style.top = `${y - menuRect.height}px`;
+                }
+                if (menuRect.left < 0) { // x is click coordinate, menuRect.left is actual rendered left
+                     menu.style.right = `calc(100vw - ${x + menuRect.width}px)`; // Adjust to keep it on screen
+                }
+                if (document.dir === 'rtl') {
+                    if (x - menuRect.width < 0) { // Check if it goes off the left side in RTL
+                        menu.style.right = `calc(100vw - ${x + menuRect.width}px)`;
+                    }
+                } else { // LTR
+                    if (x + menuRect.width > window.innerWidth) {
+                        menu.style.left = `${x - menuRect.width}px`;
+                        menu.style.right = 'auto';
+                    } else {
+                        menu.style.left = `${x}px`;
+                        menu.style.right = 'auto';
+                    }
+                }
+            }
+
+            function hide() {
+                menu.classList.add('hidden');
+                currentTargetElement = null;
+            }
+
+            function init() {
+                document.addEventListener('click', (e) => {
+                    if (!menu.contains(e.target)) {
+                        hide();
+                    }
+                });
+                document.addEventListener('contextmenu', (e) => {
+                    // Prevent default context menu if our custom one is shown for a specific target
+                    // Logic to determine if custom menu should show will be in the event listener that calls ContextMenuManager.show()
+                });
+            }
+
+            return { init, show, hide };
+        })();
+        
+        // --- Undo/Redo Manager (Simple State-Based for Students) ---
+        const UndoRedoManager = (() => {
+            let currentContext = 'students'; // Can be expanded for other contexts
+
+            function recordState(context, state) {
+                if (context !== currentContext) { // If context changes, clear stacks
+                    undoStack.length = 0;
+                    redoStack.length = 0;
+                    currentContext = context;
+                }
+
+                undoStack.push(JSON.parse(JSON.stringify(state))); // Deep copy
+                if (undoStack.length > MAX_UNDO_STEPS) {
+                    undoStack.shift(); // Keep stack size limited
+                }
+                redoStack.length = 0; // Clear redo stack on new action
+                updateUndoRedoButtons();
+                Utils.setUnsavedChanges(true);
+            }
+
+            function undo() {
+                if (undoStack.length > 0) {
+                    const prevState = undoStack.pop();
+                    // The actual current state needs to be pushed to redoStack BEFORE restoring prevState
+                    // For students, this would be currentRegisterData.students
+                    redoStack.push(JSON.parse(JSON.stringify(currentRegisterData.students))); 
+                    currentRegisterData.students = JSON.parse(JSON.stringify(prevState)); // Restore
+                    StudentManager.renderStudentTable(); // Re-render
+                    updateUndoRedoButtons();
+                    Utils.setUnsavedChanges(true);
+                    App.saveCurrentRegisterData(); // Save the undone state
+                }
+            }
+
+            function redo() {
+                if (redoStack.length > 0) {
+                    const nextState = redoStack.pop();
+                    // Current state (which is an undone state) goes to undoStack
+                    undoStack.push(JSON.parse(JSON.stringify(currentRegisterData.students)));
+                    currentRegisterData.students = JSON.parse(JSON.stringify(nextState)); // Restore
+                    StudentManager.renderStudentTable(); // Re-render
+                    updateUndoRedoButtons();
+                    Utils.setUnsavedChanges(true);
+                    App.saveCurrentRegisterData(); // Save the redone state
+                }
+            }
+            
+            function updateUndoRedoButtons() {
+                DOM.undoStudentAction.disabled = undoStack.length === 0;
+                DOM.redoStudentAction.disabled = redoStack.length === 0;
+            }
+            
+            function clearStacks() {
+                undoStack.length = 0;
+                redoStack.length = 0;
+                updateUndoRedoButtons();
+            }
+
+            return { recordState, undo, redo, updateUndoRedoButtons, clearStacks };
+        })();
+
+
+        // --- UI Renderer (General helpers, specific renderers in modules) ---
+        const UIRenderer = (() => {
+            function setAllStrings() {
+                // General
+                DOM.appTitle.textContent = L.appName;
+                DOM.manageRegistersButton.textContent = L.manageRegisters;
+                // Theme button text set by ThemeManager
+                
+                // Register Management
+                DOM.manageRegistersTitle.textContent = L.manageRegisters;
+                DOM.switchRegisterButton.textContent = L.switchRegister;
+                DOM.createNewRegisterButton.textContent = L.createNewRegister;
+                DOM.renameRegisterButton.textContent = L.renameRegister;
+                DOM.cloneRegisterButton.textContent = L.cloneRegister;
+                DOM.deleteRegisterButton.textContent = L.deleteRegister;
+                DOM.exportRegisterJsonButton.textContent = L.exportRegisterJSON;
+                DOM.exportRegisterHtmlButton.textContent = L.exportRegisterHTML;
+                DOM.importRegisterLabel.textContent = L.importRegisterJSONLabel;
+                DOM.importRegisterButton.textContent = L.importRegisterJSON;
+                DOM.resetAppDataButton.textContent = L.resetAppData;
+
+                // Main Content Headers
+                DOM.registerHeaderTitle.textContent = L.registerHeaderInfo;
+                DOM.editHeaderInfoButton.textContent = L.editHeaderInfo;
+                DOM.lblSchoolName.textContent = L.schoolName + ":";
+                DOM.lblClassName.textContent = L.className + ":";
+                DOM.lblSectionName.textContent = L.sectionName + ":";
+                DOM.lblTeacherName.textContent = L.teacherName + ":";
+                DOM.lblAcademicYear.textContent = L.academicYear + ":";
+                DOM.lblSchoolLogo.textContent = L.schoolLogo + ":";
+                DOM.infoNoLogo.textContent = L.noLogo;
+
+                // Tabs
+                DOM.navStudents.textContent = L.studentManagement;
+                DOM.navAttendance.textContent = L.attendance;
+                DOM.navMarks.textContent = L.marks;
+                DOM.navSummary.textContent = L.summaryAndStatistics;
+                DOM.navReports.textContent = L.reports;
+                DOM.navSettings.textContent = L.appSettings;
+
+                // Students Tab
+                DOM.studentsListTitle.textContent = L.studentsList;
+                DOM.addStudentButton.textContent = L.addStudent;
+                DOM.searchStudentInput.placeholder = L.searchStudentPlaceholder;
+                DOM.undoStudentAction.textContent = L.undo;
+                DOM.redoStudentAction.textContent = L.redo;
+                DOM.thRollNumber.textContent = L.rollNumber;
+                DOM.thStudentName.textContent = L.studentName;
+                DOM.thFatherName.textContent = L.fatherName; // Example custom field
+                DOM.thActions.textContent = L.actions;
+                DOM.noStudentsMessage.textContent = L.noStudentsInSection;
+
+                // Attendance Tab
+                DOM.attendanceRegisterTitle.textContent = L.attendanceRegister;
+                DOM.lblSelectMonthYear.textContent = L.selectMonthYear;
+                DOM.lblAttendanceMarkingStyle.textContent = L.attendanceMarkingStyle;
+                DOM.optTickCross.textContent = L.styleTickCross;
+                DOM.optAP.textContent = L.styleAP;
+                DOM.optArrows.textContent = L.styleArrows;
+                DOM.printAttendanceButton.textContent = L.print;
+                DOM.lblBulkMark.textContent = L.bulkMarkDay;
+                DOM.optMarkPresent.textContent = L.present;
+                DOM.optMarkAbsent.textContent = L.absent;
+                DOM.optMarkLeave.textContent = L.leave;
+                DOM.optMarkHoliday.textContent = L.holiday;
+                DOM.optMarkClear.textContent = L.clearDay;
+                DOM.applyBulkMarkButton.textContent = L.applyBulkMark;
+                DOM.noStudentsForAttendance.textContent = L.noStudentsForAttendance;
+                DOM.attendanceSummaryTitle.textContent = L.attendanceSummary;
+                DOM.lblTotalPresent.textContent = L.totalPresent;
+                DOM.lblTotalAbsent.textContent = L.totalAbsent;
+                DOM.lblTotalLeave.textContent = L.totalLeave;
+                DOM.lblOverallAttendancePercentage.textContent = L.overallAttendancePercentage;
+                
+                // Marks Tab
+                DOM.marksRegisterTitle.textContent = L.marksRegister;
+                DOM.configureSubjectsAssessmentsButton.textContent = L.configureSubjectsAssessments;
+                DOM.lblMarksFilterSubject.textContent = L.filterBySubject;
+                DOM.lblMarksFilterAssessment.textContent = L.filterByAssessment;
+                DOM.printMarksButton.textContent = L.print;
+                DOM.noStudentsForMarks.textContent = L.noStudentsForMarks;
+                DOM.noSubjectsForMarks.textContent = L.noSubjectsForMarks;
+
+                // Summary Tab
+                DOM.summaryStatsTitle.textContent = L.summaryAndStatistics;
+                DOM.summaryPlaceholder.textContent = L.summaryPlaceholder; // Update if content is dynamic
+                DOM.printSummaryButton.textContent = L.printSummary;
+
+                // Reports Tab
+                DOM.reportsSectionTitle.textContent = L.reports;
+                DOM.lblReportType.textContent = L.reportType;
+                DOM.optStudentCard.textContent = L.studentCard;
+                DOM.optClassAttendanceSummary.textContent = L.classAttendanceSummaryReport;
+                DOM.optClassMarksSummary.textContent = L.classMarksSummaryReport;
+                DOM.lblReportStudentSelect.textContent = L.selectStudentForReport;
+                DOM.lblReportStartDate.textContent = L.startDate;
+                DOM.lblReportEndDate.textContent = L.endDate;
+                DOM.generateReportButton.textContent = L.generateReport;
+                DOM.reportOutputPlaceholder.textContent = L.reportOutputPlaceholder;
+
+                // Settings Tab
+                DOM.appSettingsTitle.textContent = L.appSettings;
+                DOM.lblLowAttendanceThreshold.textContent = L.lowAttendanceThreshold;
+                DOM.lblPassingMarksPercentage.textContent = L.passingMarksPercentage;
+                DOM.saveAppSettingsButton.textContent = L.saveAppSettings;
+
+                // Footer
+                DOM.currentYearFooter.textContent = new Date().getFullYear();
+                DOM.footerAppName.textContent = L.footerAppName;
+                DOM.versionInfo.textContent = L.version + " 1.0.0"; // Example version
+            }
+
+            function displayMessage(message, type = 'info', duration = 3000) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `app-message ${type}`; // CSS needed for .app-message, .info, .success, .error
+                messageDiv.textContent = message;
+                messageDiv.style.position = 'fixed';
+                messageDiv.style.bottom = '20px';
+                messageDiv.style.left = '20px'; // For RTL, maybe right: 20px;
+                messageDiv.style.padding = '10px 20px';
+                messageDiv.style.backgroundColor = type === 'success' ? 'var(--success-color)' : (type === 'error' ? 'var(--danger-color)' : 'var(--info-color)');
+                messageDiv.style.color = 'white';
+                messageDiv.style.borderRadius = 'var(--border-radius)';
+                messageDiv.style.zIndex = '2000';
+                document.body.appendChild(messageDiv);
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, duration);
+            }
+
+            function activateTab(tabId) {
+                DOM.tabs.forEach(button => button.classList.remove("active"));
+                DOM.tabContents.forEach(content => content.classList.remove("active"));
+                
+                const tabButton = $(`button[data-tab="${tabId}"]`);
+                if (tabButton) tabButton.classList.add("active");
+                const tabContent = $(`#${tabId}`);
+                if (tabContent) tabContent.classList.add("active");
+                
+                // Specific actions when tab becomes active
+                if (tabId === 'attendance-tab') AttendanceManager.renderAttendanceGrid();
+                if (tabId === 'marks-tab') MarksManager.renderMarksTable();
+                if (tabId === 'summary-stats-tab') SummaryStats.renderSummary();
+                if (tabId === 'reports-tab') ReportGenerator.initReportFilters();
+            }
+            
+            function updateRegisterHeaderDisplay() {
+                if (!currentRegisterData || !currentRegisterData.info) return;
+                const info = currentRegisterData.info;
+                DOM.infoSchoolName.textContent = info.schoolName || "-";
+                DOM.infoClassName.textContent = info.className || "-";
+                DOM.infoSectionName.textContent = info.sectionName || "-";
+                DOM.infoTeacherName.textContent = info.teacherName || "-";
+                DOM.infoAcademicYear.textContent = info.academicYear || "-";
+                if (info.logo && info.logo.startsWith('data:image')) {
+                    DOM.schoolLogoPreview.src = info.logo;
+                    DOM.schoolLogoPreview.classList.remove('hidden');
+                    DOM.infoNoLogo.classList.add('hidden');
+                } else {
+                    DOM.schoolLogoPreview.classList.add('hidden');
+                    DOM.infoNoLogo.classList.remove('hidden');
+                }
+            }
+
+            return { setAllStrings, displayMessage, activateTab, updateRegisterHeaderDisplay };
+        })();
+
+
+        // --- Register Header Module ---
+                // --- Register Header Module ---
+        const RegisterHeader = (() => {
+            // ... (other functions like init, updateDisplay) ...
+
+            function handleEditHeaderInfo() {
+                if (!currentRegisterData) return;
+                const formHtml = `
+                    <form id="edit-header-form">
+                        <div class="form-group">
+                            <label for="form-school-name">${L.schoolName}</label>
+                            <input type="text" id="form-school-name" name="schoolName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-class-name">${L.className}</label>
+                            <input type="text" id="form-class-name" name="className" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-section-name">${L.sectionName}</label>
+                            <input type="text" id="form-section-name" name="sectionName">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-teacher-name">${L.teacherName}</label>
+                            <input type="text" id="form-teacher-name" name="teacherName">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-academic-year">${L.academicYear}</label>
+                            <input type="text" id="form-academic-year" name="academicYear" placeholder="مثلاً 2023-2024" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-logo-file">${L.schoolLogo} (اختیاری، تصویر فائل)</label>
+                            <input type="file" id="form-logo-file" name="logoFile" accept="image/*">
+                            <small>اگر منتخب نہیں کیا تو موجودہ لوگو برقرار رہے گا۔ نیا لوگو منتخب کرنے پر پرانا بدل جائے گا۔</small>
+                        </div>
+                    </form>
+                `;
+
+                ModalManager.showFormModal(L.editHeaderInfo, formHtml, async (formData) => {
+                    // This save callback receives the formData directly
+                    const newInfo = {
+                        schoolName: formData.get("schoolName"),
+                        className: formData.get("className"),
+                        sectionName: formData.get("sectionName"),
+                        teacherName: formData.get("teacherName"),
+                        academicYear: formData.get("academicYear"),
+                    };
+
+                    // The file input needs to be accessed from the modal's DOM directly when form is submitted
+                    const logoFile = DOM.formModalBody.querySelector('#form-logo-file').files[0];
+                    if (logoFile) {
+                        try {
+                            newInfo.logo = await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(logoFile);
+                            });
+                        } catch (error) {
+                            console.error("Error reading logo file:", error);
+                            UIRenderer.displayMessage(L.error + "لوگو فائل پڑھنے میں خرابی۔", "error");
+                            return; 
+                        }
+                    } else {
+                         newInfo.logo = currentRegisterData.info.logo; 
+                    }
+
+                    currentRegisterData.info = { ...currentRegisterData.info, ...newInfo };
+                    UIRenderer.updateRegisterHeaderDisplay();
+                    Utils.setUnsavedChanges(true);
+                    await App.saveCurrentRegisterData(); 
+                    ModalManager.hideFormModal();
+                    UIRenderer.displayMessage(L.operationSuccessful, "success");
+                });
+
+                // **FIX:** Populate form *after* modal DOM is guaranteed to be ready.
+                // Query elements within the context of the form modal body.
+                // This ensures we are looking for elements that were just injected.
+                // We can also call populateFormWithCurrentData from showFormModal's internal logic
+                // if it had a callback for when the DOM is ready, but this is a direct way.
+                setTimeout(() => {
+                    const info = currentRegisterData.info;
+                    // Make sure to query within the specific modal's body
+                    const modalForm = DOM.formModalBody.querySelector('#edit-header-form');
+                    if (modalForm) {
+                        modalForm.querySelector('#form-school-name').value = info.schoolName || "";
+                        modalForm.querySelector('#form-class-name').value = info.className || "";
+                        modalForm.querySelector('#form-section-name').value = info.sectionName || "";
+                        modalForm.querySelector('#form-teacher-name').value = info.teacherName || "";
+                        modalForm.querySelector('#form-academic-year').value = info.academicYear || "";
+                        // Note: The file input value cannot be programmatically set for security reasons.
+                        // The current logo handling (keep if no new file) is correct.
+                    } else {
+                        console.error("Could not find #edit-header-form in modal to populate.");
+                    }
+                }, 0); // setTimeout 0 to push to next tick, allowing DOM to update
+            }
+            // No need for a separate populateFormWithCurrentData function anymore with this approach.
+            // If you want to keep it, make sure it takes the form/modal context as an argument.
+
+            function init() {
+                DOM.editHeaderInfoButton.addEventListener("click", handleEditHeaderInfo);
+            }
+            return { init, updateDisplay: UIRenderer.updateRegisterHeaderDisplay };
+        })();
+
+        // --- Student Management Module ---
+        const StudentManager = (() => {
+            let filterText = "";
+
+            function getStudentById(studentId) {
+                return currentRegisterData.students.find(s => s.id === studentId);
+            }
+
+            function renderStudentTable() {
+                if (!currentRegisterData || !currentRegisterData.students) {
+                    DOM.studentsTableBody.innerHTML = '';
+                    DOM.noStudentsMessage.classList.remove('hidden');
+                    return;
+                }
+
+                const students = currentRegisterData.students.filter(student => {
+                    const searchTerm = filterText.toLowerCase();
+                    return (student.name && student.name.toLowerCase().includes(searchTerm)) ||
+                           (student.rollNo && student.rollNo.toString().toLowerCase().includes(searchTerm));
+                });
+
+                if (students.length === 0 && filterText === "" ) { // Only show "no students" if list is genuinely empty, not just filtered out
+                     DOM.noStudentsMessage.classList.remove('hidden');
+                } else {
+                     DOM.noStudentsMessage.classList.add('hidden');
+                }
+                
+                DOM.studentsTableBody.innerHTML = students.map(student => `
+                    <tr data-student-id="${student.id}">
+                        <td data-field="rollNo" contenteditable="false">${student.rollNo || ""}</td>
+                        <td data-field="name" contenteditable="false">${student.name || ""}</td>
+                        <td data-field="fatherName" contenteditable="false">${student.fatherName || ""}</td>
+                        <td class="no-print">
+                            <button class="edit-student sm" data-id="${student.id}">${L.edit}</button>
+                            <button class="delete-student sm danger" data-id="${student.id}">${L.delete}</button>
+                        </td>
+                    </tr>
+                `).join("");
+                UndoRedoManager.updateUndoRedoButtons();
+            }
+            
+            function handleAddStudent() {
+                const formHtml = `
+                    <form id="add-student-form">
+                        <div class="form-group">
+                            <label for="form-roll-no">${L.rollNumber}</label>
+                            <input type="text" id="form-roll-no" name="rollNo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-student-name">${L.studentName}</label>
+                            <input type="text" id="form-student-name" name="studentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-father-name">${L.fatherName}</label>
+                            <input type="text" id="form-father-name" name="fatherName">
+                        </div>
+                    </form>
+                `;
+                ModalManager.showFormModal(L.addStudent, formHtml, (formData) => {
+                    UndoRedoManager.recordState('students', currentRegisterData.students); // Record before change
+                    const newStudent = {
+                        id: Utils.generateUUID(),
+                        rollNo: formData.get("rollNo"),
+                        name: formData.get("studentName"),
+                        fatherName: formData.get("fatherName"),
+                        // metadata: {} // For future custom fields
+                    };
+                    currentRegisterData.students.push(newStudent);
+                    currentRegisterData.students.sort((a,b) => (a.rollNo || "").localeCompare(b.rollNo || "", undefined, {numeric: true})); // Keep sorted
+                    renderStudentTable();
+                    Utils.setUnsavedChanges(true);
+                    App.saveCurrentRegisterData();
+                    ModalManager.hideFormModal();
+                    UIRenderer.displayMessage(L.studentName + " " + newStudent.name + " " + L.add.toLowerCase() + " " + L.success.toLowerCase(), "success");
+                });
+            }
+
+            function handleEditStudent(studentId) {
+                const student = getStudentById(studentId);
+                if (!student) return;
+                
+                const formHtml = `
+                    <form id="edit-student-form">
+                        <input type="hidden" name="id" value="${student.id}">
+                        <div class="form-group">
+                            <label for="form-edit-roll-no">${L.rollNumber}</label>
+                            <input type="text" id="form-edit-roll-no" name="rollNo" value="${student.rollNo || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-edit-student-name">${L.studentName}</label>
+                            <input type="text" id="form-edit-student-name" name="studentName" value="${student.name || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-edit-father-name">${L.fatherName}</label>
+                            <input type="text" id="form-edit-father-name" name="fatherName" value="${student.fatherName || ''}">
+                        </div>
+                    </form>
+                `;
+                ModalManager.showFormModal(L.editStudent, formHtml, (formData) => {
+                    UndoRedoManager.recordState('students', currentRegisterData.students); // Record before change
+                    const studentIndex = currentRegisterData.students.findIndex(s => s.id === studentId);
+                    if (studentIndex > -1) {
+                        currentRegisterData.students[studentIndex] = {
+                            ...currentRegisterData.students[studentIndex],
+                            rollNo: formData.get("rollNo"),
+                            name: formData.get("studentName"),
+                            fatherName: formData.get("fatherName"),
+                        };
+                        currentRegisterData.students.sort((a,b) => (a.rollNo || "").localeCompare(b.rollNo || "", undefined, {numeric: true}));
+                        renderStudentTable();
+                        Utils.setUnsavedChanges(true);
+                        App.saveCurrentRegisterData();
+                        ModalManager.hideFormModal();
+                        UIRenderer.displayMessage(L.operationSuccessful, "success");
+                    }
+                });
+            }
+
+            function handleDeleteStudent(studentId) {
+                const student = getStudentById(studentId);
+                if (!student) return;
+                ModalManager.showGenericModal(L.confirmDeleteStudent, `${L.confirmDeleteStudent} (${student.name || L.studentName})?`, () => {
+                    UndoRedoManager.recordState('students', currentRegisterData.students); // Record before change
+                    currentRegisterData.students = currentRegisterData.students.filter(s => s.id !== studentId);
+                    // Also need to remove related attendance and marks data for this student
+                    if (currentRegisterData.attendance && currentRegisterData.attendance[studentId]) {
+                        delete currentRegisterData.attendance[studentId];
+                    }
+                    if (currentRegisterData.marks && currentRegisterData.marks[studentId]) {
+                        delete currentRegisterData.marks[studentId];
+                    }
+                    renderStudentTable();
+                    Utils.setUnsavedChanges(true);
+                    App.saveCurrentRegisterData();
+                    UIRenderer.displayMessage(L.operationSuccessful, "success");
+                });
+            }
+            
+            // Inline editing (simplified - click to enable, blur to save)
+            // For full inline editing like a spreadsheet, more complex event handling is needed.
+            // The current implementation uses modal for editing for better UX on mobile and data validation.
+            // This is a placeholder if true inline editing is desired.
+            function makeCellEditable(tdElement) {
+                // This function is complex for full inline editing.
+                // It would involve replacing td content with input, handling Enter/Esc/Blur.
+                // Sticking to modal-based editing for simplicity and robustness.
+                // console.log("Inline edit for cell:", tdElement);
+            }
+
+            function init() {
+                DOM.addStudentButton.addEventListener("click", handleAddStudent);
+                DOM.studentsTableBody.addEventListener("click", (event) => {
+                    if (event.target.classList.contains("edit-student")) {
+                        handleEditStudent(event.target.dataset.id);
+                    } else if (event.target.classList.contains("delete-student")) {
+                        handleDeleteStudent(event.target.dataset.id);
+                    }
+                    // else if (event.target.tagName === 'TD' && event.target.contentEditable === "false") {
+                    //     // Simple click-to-edit (can be expanded)
+                    //     // For now, we use explicit Edit buttons
+                    // }
+                });
+                
+                // Context Menu for student rows
+                DOM.studentsTableBody.addEventListener('contextmenu', (event) => {
+                    event.preventDefault();
+                    const row = event.target.closest('tr');
+                    if (!row) return;
+                    const studentId = row.dataset.studentId;
+                    if (!studentId) return;
+
+                    const items = [
+                        { label: L.editStudent, action: () => handleEditStudent(studentId) },
+                        { label: L.deleteStudent, action: () => handleDeleteStudent(studentId) },
+                        // Add more actions like "View Details", "Print Student Card" etc.
+                    ];
+                    ContextMenuManager.show(event.clientX, event.clientY, items, row);
+                });
+
+                // Search/filter students
+                DOM.searchStudentInput.addEventListener("input", Utils.debounce(() => {
+                    filterText = DOM.searchStudentInput.value;
+                    renderStudentTable();
+                }, 300));
+
+                // Undo/Redo buttons
+                DOM.undoStudentAction.addEventListener('click', UndoRedoManager.undo);
+                DOM.redoStudentAction.addEventListener('click', UndoRedoManager.redo);
+            }
+
+            return { init, renderStudentTable, getStudentById };
+        })();
+
+        // --- Attendance Manager ---
+                // --- Attendance Manager ---
+        const AttendanceManager = (() => {
+            let currentMonthYear = ""; 
+            let currentMarkingStyle = "tick_cross";
+
+            const MARK_SYMBOLS = {
+                tick_cross: { P: '✓', A: '✗', L: 'ر', H: 'چ', X: '-' },
+                ap: { P: 'ح', A: 'غ', L: 'ر', H: 'چ', X: '-' },
+                arrows: { P: '↑', A: '↓', L: '→', H: '□', X: '-' } 
+            };
+
+            function getAttendanceForStudentDate(studentId, dateStr) { 
+                const monthStr = dateStr.substring(0, 7); 
+                return currentRegisterData.attendance?.[studentId]?.[monthStr]?.[dateStr.substring(8,10)] || 'X'; 
+            }
+
+            function setAttendanceForStudentDate(studentId, dateStr, status) {
+                const monthStr = dateStr.substring(0, 7); 
+                const dayStr = dateStr.substring(8,10);
+
+                if (!currentRegisterData.attendance) currentRegisterData.attendance = {};
+                if (!currentRegisterData.attendance[studentId]) currentRegisterData.attendance[studentId] = {};
+                if (!currentRegisterData.attendance[studentId][monthStr]) currentRegisterData.attendance[studentId][monthStr] = {};
+                
+                currentRegisterData.attendance[studentId][monthStr][dayStr] = status;
+                Utils.setUnsavedChanges(true);
+            }
+            
+            function getNextStatus(currentStatus) {
+                switch (currentStatus) {
+                    case 'P': return 'A';
+                    case 'A': return 'L';
+                    case 'L': return 'X'; 
+                    case 'H': return 'P'; 
+                    case 'X':
+                    default: return 'P';
+                }
+            }
+
+            function renderAttendanceGrid() {
+                if (!currentRegisterData || !currentRegisterData.students || currentRegisterData.students.length === 0) {
+                    DOM.attendanceTableHead.innerHTML = '';
+                    DOM.attendanceTableBody.innerHTML = '';
+                    DOM.noStudentsForAttendance.classList.remove('hidden');
+                    DOM.bulkAttendanceActions.classList.add('hidden');
+                    updateAttendanceSummary();
+                    return;
+                }
+                DOM.noStudentsForAttendance.classList.add('hidden');
+                DOM.bulkAttendanceActions.classList.remove('hidden');
+
+                const [year, month] = currentMonthYear.split("-").map(Number); 
+                const daysInMonth = Utils.getDaysInMonth(year, month - 1); 
+
+                let headerHtml = `<tr><th>${L.rollNumber}</th><th>${L.studentName}</th>`;
+                DOM.bulkMarkDaySelect.innerHTML = `<option value="">${L.selectDay || 'دن منتخب کریں'}</option>`; 
+                if (!L.selectDay) L.selectDay = "دن منتخب کریں";
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                    const dayName = Utils.getUrduDayName(dateStr);
+                    headerHtml += `<th title="${dayName}">${day}<br><small>${dayName.substring(0,2)}</small></th>`;
+                    DOM.bulkMarkDaySelect.innerHTML += `<option value="${day}">${day}</option>`;
+                }
+                headerHtml += `<th>${L.totalPresent}</th><th>${L.totalAbsent}</th><th>${L.totalLeave}</th><th>${L.attendancePercentage}</th></tr>`;
+                DOM.attendanceTableHead.innerHTML = headerHtml;
+
+                let bodyHtml = "";
+                currentRegisterData.students.forEach(student => {
+                    let presentCount = 0;
+                    let absentCount = 0;
+                    let leaveCount = 0;
+                    let holidayCount = 0; 
+                    let studentRowHtml = `<tr><td>${student.rollNo}</td><td>${student.name}</td>`;
+                    
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                        const status = getAttendanceForStudentDate(student.id, dateStr);
+                        
+                        if (status === 'P') presentCount++;
+                        else if (status === 'A') absentCount++;
+                        else if (status === 'L') leaveCount++;
+                        else if (status === 'H') holidayCount++;
+
+                        studentRowHtml += `<td class="attendance-cell attendance-${status}" data-student-id="${student.id}" data-date="${dateStr}">${MARK_SYMBOLS[currentMarkingStyle][status] || status}</td>`;
+                    }
+                    
+                    const totalMarkedDays = presentCount + absentCount + leaveCount; 
+                    const attendancePercent = totalMarkedDays > 0 ? ((presentCount / totalMarkedDays) * 100).toFixed(1) : 0;
+                    
+                    let percentageCellClass = "";
+                    if (parseFloat(attendancePercent) < appSettings.lowAttendanceThreshold && totalMarkedDays > 0) {
+                         percentageCellClass = "low-attendance";
+                    }
+
+                    studentRowHtml += `<td>${presentCount}</td><td>${absentCount}</td><td>${leaveCount}</td><td class="${percentageCellClass}">${attendancePercent}%</td></tr>`;
+                    bodyHtml += studentRowHtml;
+                });
+                DOM.attendanceTableBody.innerHTML = bodyHtml; // This innerHTML assignment might be the culprit
+                updateAttendanceSummary();
+            }
+
+            function handleCellClick(event) {
+                const cell = event.target.closest(".attendance-cell");
+                if (!cell) return;
+
+                const studentId = cell.dataset.studentId;
+                const dateStr = cell.dataset.date;
+                const currentStatus = getAttendanceForStudentDate(studentId, dateStr);
+                const newStatus = getNextStatus(currentStatus);
+                
+                setAttendanceForStudentDate(studentId, dateStr, newStatus);
+                cell.textContent = MARK_SYMBOLS[currentMarkingStyle][newStatus] || newStatus;
+                cell.className = `attendance-cell attendance-${newStatus}`; 
+                
+                renderAttendanceGrid(); 
+                
+                // ***** DEFENSIVE CHECK FOR App *****
+                if (typeof App !== 'undefined' && App.saveCurrentRegisterData) {
+                    App.saveCurrentRegisterData(); // The problematic line
+                } else {
+                    console.warn("AttendanceManager.handleCellClick: App or App.saveCurrentRegisterData is not yet defined. Save deferred.");
+                    // Optionally, queue this save action if App isn't ready
+                }
+            }
+            
+            function handleBulkMark() {
+                const day = DOM.bulkMarkDaySelect.value;
+                const status = DOM.bulkMarkStatusSelect.value;
+                if (!day) {
+                    UIRenderer.displayMessage((L.selectDay || "دن منتخب کریں") + " " + L.error.toLowerCase(), "warning");
+                    return;
+                }
+                
+                const [year, month] = currentMonthYear.split("-").map(Number);
+                const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+
+                currentRegisterData.students.forEach(student => {
+                    setAttendanceForStudentDate(student.id, dateStr, status);
+                });
+                renderAttendanceGrid();
+                if (typeof App !== 'undefined' && App.saveCurrentRegisterData) {
+                    App.saveCurrentRegisterData();
+                }
+                UIRenderer.displayMessage(L.operationSuccessful, "success");
+            }
+
+            function updateAttendanceSummary() {
+                 if (!currentRegisterData || !currentRegisterData.students || !currentMonthYear) {
+                    DOM.statsTotalPresent.textContent = "0";
+                    DOM.statsTotalAbsent.textContent = "0";
+                    DOM.statsTotalLeave.textContent = "0";
+                    DOM.statsOverallAttendance.textContent = "0%";
+                    return;
+                }
+
+                let totalPresent = 0, totalAbsent = 0, totalLeave = 0, totalPossibleDays = 0;
+                const [year, month] = currentMonthYear.split("-").map(Number);
+                const daysInThisMonth = Utils.getDaysInMonth(year, month - 1);
+
+                currentRegisterData.students.forEach(student => {
+                    for (let day = 1; day <= daysInThisMonth; day++) {
+                        const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                        const status = getAttendanceForStudentDate(student.id, dateStr);
+                        if (status === 'P') totalPresent++;
+                        else if (status === 'A') totalAbsent++;
+                        else if (status === 'L') totalLeave++;
+                        
+                        if (status !== 'H' && status !== 'X') { 
+                            totalPossibleDays++;
+                        }
+                    }
+                });
+                
+                DOM.statsTotalPresent.textContent = totalPresent;
+                DOM.statsTotalAbsent.textContent = totalAbsent;
+                DOM.statsTotalLeave.textContent = totalLeave;
+                const overallPercentage = totalPossibleDays > 0 ? ((totalPresent / totalPossibleDays) * 100).toFixed(1) : 0;
+                DOM.statsOverallAttendance.textContent = `${overallPercentage}%`;
+            }
+
+
+            function init() {
+                const today = new Date();
+                currentMonthYear = Utils.formatDate(today).substring(0, 7);
+                DOM.attendanceMonthYear.value = currentMonthYear;
+                
+                currentMarkingStyle = currentRegisterData?.settings?.attendanceMarkingStyle || "tick_cross";
+                DOM.attendanceMarkingStyle.value = currentMarkingStyle;
+
+                DOM.attendanceMonthYear.addEventListener("change", (event) => {
+                    currentMonthYear = event.target.value;
+                    if(currentRegisterData) { 
+                        if (!currentRegisterData.settings) currentRegisterData.settings = {};
+                        currentRegisterData.settings.currentAttendanceMonth = currentMonthYear;
+                         if (typeof App !== 'undefined' && App.saveCurrentRegisterData) App.saveCurrentRegisterData(); 
+                    }
+                    renderAttendanceGrid();
+                });
+
+                DOM.attendanceMarkingStyle.addEventListener("change", (event) => {
+                    currentMarkingStyle = event.target.value;
+                     if(currentRegisterData) { 
+                        if (!currentRegisterData.settings) currentRegisterData.settings = {};
+                        currentRegisterData.settings.attendanceMarkingStyle = currentMarkingStyle;
+                        if (typeof App !== 'undefined' && App.saveCurrentRegisterData) App.saveCurrentRegisterData();
+                    }
+                    renderAttendanceGrid(); 
+                });
+
+                // ***** DEFER ATTACHMENT OF THE CLICK LISTENER *****
+                setTimeout(() => {
+                    DOM.attendanceTableBody.addEventListener("click", handleCellClick);
+                    // console.log("Attendance table click listener attached DEFERRED.");
+                }, 0); // Defer to ensure App is likely defined when this runs
+
+                DOM.applyBulkMarkButton.addEventListener("click", handleBulkMark);
+                DOM.printAttendanceButton.addEventListener("click", () => {
+                    ReportGenerator.printSection(DOM.attendanceTab, L.attendanceRegister + " - " + currentMonthYear);
+                });
+            }
+            
+            function loadCurrentSettings() { 
+                if(currentRegisterData && currentRegisterData.settings) {
+                    currentMonthYear = currentRegisterData.settings.currentAttendanceMonth || Utils.formatDate(new Date()).substring(0, 7);
+                    currentMarkingStyle = currentRegisterData.settings.attendanceMarkingStyle || "tick_cross";
+                } else {
+                    const today = new Date();
+                    currentMonthYear = Utils.formatDate(today).substring(0, 7);
+                    currentMarkingStyle = "tick_cross";
+                }
+                DOM.attendanceMonthYear.value = currentMonthYear;
+                DOM.attendanceMarkingStyle.value = currentMarkingStyle;
+            }
+
+            return { init, renderAttendanceGrid, loadCurrentSettings };
+        })();
+        // --- Marks Manager ---
+                // --- Marks Manager ---
+        const MarksManager = (() => {
+            let selectedSubjectFilter = "all";
+            let selectedAssessmentFilter = "all";
+
+            // Declare debouncedSaveMarks here, but don't define it yet.
+            let debouncedSaveMarks = null;
+
+            // Function to lazily initialize and get the debounced function
+            function getDebouncedSaveMarks() {
+                if (!debouncedSaveMarks) {
+                    if (typeof App !== 'undefined' && App.saveCurrentRegisterData) {
+                        debouncedSaveMarks = Utils.debounce(App.saveCurrentRegisterData, 1500);
+                    } else {
+                        // This case should ideally not happen if App initialization is correct
+                        // and this function is called after App is ready.
+                        console.error("MarksManager: App is not defined when trying to create debouncedSaveMarks. Saving will be direct.");
+                        // Fallback to direct save if App isn't ready for debounce, or throw error
+                        return App.saveCurrentRegisterData; // Or handle error appropriately
+                    }
+                }
+                return debouncedSaveMarks;
+            }
+
+            function getSubjectById(id) {
+                return currentRegisterData.subjects?.find(s => s.id === id);
+            }
+            function getAssessmentById(id) {
+                return currentRegisterData.assessmentTypes?.find(a => a.id === id);
+            }
+
+            function renderMarksTable() {
+                if (!currentRegisterData || !currentRegisterData.students || currentRegisterData.students.length === 0) {
+                    DOM.marksTableHead.innerHTML = '';
+                    DOM.marksTableBody.innerHTML = '';
+                    DOM.noStudentsForMarks.classList.remove('hidden');
+                    DOM.noSubjectsForMarks.classList.add('hidden');
+                    return;
+                }
+                DOM.noStudentsForMarks.classList.add('hidden');
+
+                if (!currentRegisterData.subjects?.length || !currentRegisterData.assessmentTypes?.length) {
+                    DOM.marksTableHead.innerHTML = '';
+                    DOM.marksTableBody.innerHTML = '';
+                    DOM.noSubjectsForMarks.classList.remove('hidden');
+                    return;
+                }
+                DOM.noSubjectsForMarks.classList.add('hidden');
+
+                const subjectsToDisplay = selectedSubjectFilter === "all" 
+                    ? currentRegisterData.subjects 
+                    : [currentRegisterData.subjects.find(s => s.id === selectedSubjectFilter)].filter(Boolean);
+                
+                const assessmentsToDisplay = selectedAssessmentFilter === "all"
+                    ? currentRegisterData.assessmentTypes
+                    : [currentRegisterData.assessmentTypes.find(a => a.id === selectedAssessmentFilter)].filter(Boolean);
+
+                if (!subjectsToDisplay.length || !assessmentsToDisplay.length) {
+                    DOM.marksTableHead.innerHTML = `<tr><th>${L.rollNumber}</th><th>${L.studentName}</th><th>${L.noSubjectsForMarks}</th></tr>`;
+                    DOM.marksTableBody.innerHTML = '';
+                    return;
+                }
+
+                let headerHtml = `<tr><th rowspan="2">${L.rollNumber}</th><th rowspan="2">${L.studentName}</th>`;
+                subjectsToDisplay.forEach(subject => {
+                    headerHtml += `<th colspan="${assessmentsToDisplay.length + 1}">${subject.name} (${L.total}: ${subject.maxMarks || (L.notSet || 'N/A')})</th>`;
+                });
+                if (!L.notSet) L.notSet = "طے نہیں";
+                headerHtml += `<th rowspan="2">${L.totalMarks}</th><th rowspan="2">${L.percentage}</th><th rowspan="2">${L.grade}</th></tr>`;
+                
+                headerHtml += `<tr>`; 
+                subjectsToDisplay.forEach(subject => {
+                    assessmentsToDisplay.forEach(assessment => {
+                        headerHtml += `<th>${assessment.name} (${L.total}: ${assessment.maxMarks || (L.notSet || 'N/A')})</th>`;
+                    });
+                    headerHtml += `<th>${L.total} (${subject.name})</th>`; 
+                });
+                headerHtml += `</tr>`;
+                DOM.marksTableHead.innerHTML = headerHtml;
+
+                let bodyHtml = "";
+                currentRegisterData.students.forEach(student => {
+                    let studentRowHtml = `<tr><td>${student.rollNo}</td><td>${student.name}</td>`;
+                    let studentGrandTotalMarks = 0;
+                    let studentMaxPossibleGrandTotal = 0;
+
+                    subjectsToDisplay.forEach(subject => {
+                        let studentSubjectTotal = 0;
+                        let subjectMaxPossibleTotalForStudent = 0;
+
+                        assessmentsToDisplay.forEach(assessment => {
+                            const marks = currentRegisterData.marks?.[student.id]?.[subject.id]?.[assessment.id] ?? "";
+                            const maxAssessmentMarks = parseFloat(assessment.maxMarks);
+                            
+                            if (marks !== "" && !isNaN(parseFloat(marks))) {
+                                studentSubjectTotal += parseFloat(marks);
+                            }
+                            if (!isNaN(maxAssessmentMarks)) {
+                                subjectMaxPossibleTotalForStudent += maxAssessmentMarks;
+                            }
+                            
+                            let cellClass = "";
+                            if (marks !== "" && !isNaN(maxAssessmentMarks) && (parseFloat(marks) / maxAssessmentMarks * 100) < appSettings.passingMarksPercentage) {
+                                cellClass = "failing-mark";
+                            }
+
+                            studentRowHtml += `
+                                <td class="${cellClass}">
+                                    <input type="number" class="marks-input"
+                                           data-student-id="${student.id}"
+                                           data-subject-id="${subject.id}"
+                                           data-assessment-id="${assessment.id}"
+                                           value="${marks}"
+                                           min="0" max="${assessment.maxMarks || 1000}"
+                                           placeholder="0-${assessment.maxMarks || ''}">
+                                </td>`;
+                        });
+                        studentRowHtml += `<td>${studentSubjectTotal.toFixed(1)} / ${subjectMaxPossibleTotalForStudent.toFixed(1)}</td>`;
+                        studentGrandTotalMarks += studentSubjectTotal;
+                        studentMaxPossibleGrandTotal += subjectMaxPossibleTotalForStudent;
+                    });
+                    
+                    const studentPercentage = studentMaxPossibleGrandTotal > 0 ? (studentGrandTotalMarks / studentMaxPossibleGrandTotal * 100) : 0;
+                    const studentGrade = Utils.calculateGrade(studentPercentage);
+
+                    studentRowHtml += `<td>${studentGrandTotalMarks.toFixed(1)} / ${studentMaxPossibleGrandTotal.toFixed(1)}</td>`;
+                    studentRowHtml += `<td class="${studentPercentage < appSettings.passingMarksPercentage && studentMaxPossibleGrandTotal > 0 ? 'failing-mark' : ''}">${studentPercentage.toFixed(1)}%</td>`;
+                    studentRowHtml += `<td>${studentGrade}</td>`;
+                    studentRowHtml += `</tr>`;
+                    bodyHtml += studentRowHtml;
+                });
+                DOM.marksTableBody.innerHTML = bodyHtml;
+                
+                $$('.marks-input').forEach(input => {
+                    input.addEventListener('change', handleMarkInput);
+                    input.addEventListener('blur', handleMarkInput); 
+                });
+            }
+
+            function handleMarkInput(event) {
+                const input = event.target;
+                const studentId = input.dataset.studentId;
+                const subjectId = input.dataset.subjectId;
+                const assessmentId = input.dataset.assessmentId;
+                let value = input.value.trim();
+                
+                const assessment = getAssessmentById(assessmentId);
+                const maxMarks = assessment ? parseFloat(assessment.maxMarks) : null;
+
+                if (value === "") { 
+                    if (currentRegisterData.marks?.[studentId]?.[subjectId]) {
+                        delete currentRegisterData.marks[studentId][subjectId][assessmentId];
+                        if (Object.keys(currentRegisterData.marks[studentId][subjectId]).length === 0) {
+                            delete currentRegisterData.marks[studentId][subjectId];
+                        }
+                        if (Object.keys(currentRegisterData.marks[studentId]).length === 0) {
+                            delete currentRegisterData.marks[studentId];
+                        }
+                    }
+                } else {
+                    const numericValue = parseFloat(value);
+                    if (isNaN(numericValue) || (maxMarks !== null && (numericValue < 0 || numericValue > maxMarks))) {
+                        UIRenderer.displayMessage(L.marksValidationErrorRange.replace('{min}', 0).replace('{max}', maxMarks !== null ? maxMarks : '∞'), "error");
+                        const oldValue = currentRegisterData.marks?.[studentId]?.[subjectId]?.[assessmentId] ?? "";
+                        input.value = oldValue; 
+                        return;
+                    }
+                    value = numericValue; 
+
+                    if (!currentRegisterData.marks) currentRegisterData.marks = {};
+                    if (!currentRegisterData.marks[studentId]) currentRegisterData.marks[studentId] = {};
+                    if (!currentRegisterData.marks[studentId][subjectId]) currentRegisterData.marks[studentId][subjectId] = {};
+                    currentRegisterData.marks[studentId][subjectId][assessmentId] = value;
+                }
+
+                Utils.setUnsavedChanges(true);
+                // Get the (possibly now initialized) debounced function and call it
+                const saveFn = getDebouncedSaveMarks();
+                if (saveFn) {
+                    saveFn();
+                } else {
+                    // This else block should ideally not be hit if App is initialized correctly
+                    console.error("MarksManager.handleMarkInput: Could not get a save function.");
+                }
+                renderMarksTable(); 
+            }
+            
+            function populateFilterDropdowns() {
+                DOM.marksFilterSubject.innerHTML = `<option value="all">${L.allSubjects}</option>`;
+                currentRegisterData.subjects?.forEach(subject => {
+                    DOM.marksFilterSubject.innerHTML += `<option value="${subject.id}">${subject.name}</option>`;
+                });
+                DOM.marksFilterSubject.value = selectedSubjectFilter;
+
+                DOM.marksFilterAssessment.innerHTML = `<option value="all">${L.allAssessments}</option>`;
+                currentRegisterData.assessmentTypes?.forEach(assessment => {
+                    DOM.marksFilterAssessment.innerHTML += `<option value="${assessment.id}">${assessment.name}</option>`;
+                });
+                DOM.marksFilterAssessment.value = selectedAssessmentFilter;
+            }
+
+            function handleConfigureSubjectsAssessments() {
+                let formHtml = `<h4>${L.subjects}</h4>`;
+                formHtml += `<div id="subjects-list-modal-div"></div>`;
+                formHtml += `<button type="button" id="add-subject-btn-modal" class="sm mt-1">${L.addSubject}</button>`;
+                formHtml += `<hr class="mt-1 mb-1"><h4>${L.assessmentTypes}</h4>`;
+                formHtml += `<div id="assessments-list-modal-div"></div>`;
+                formHtml += `<button type="button" id="add-assessment-btn-modal" class="sm mt-1">${L.addAssessmentType}</button>`;
+                
+                ModalManager.showFormModal(L.configureSubjectsAssessments, formHtml, () => {
+                    // Check if App and its save function are available before calling
+                    if (typeof App !== 'undefined' && App.saveCurrentRegisterData) {
+                        App.saveCurrentRegisterData();
+                    } else {
+                        console.warn("MarksManager.handleConfigureSubjectsAssessments: App.saveCurrentRegisterData not available.");
+                    }
+                    renderMarksTable(); 
+                    populateFilterDropdowns();
+                    ModalManager.hideFormModal();
+                    UIRenderer.displayMessage(L.operationSuccessful, "success");
+                }, L.close);
+
+                renderSubjectsListInModal();
+                renderAssessmentsListInModal();
+
+                DOM.formModalBody.querySelector('#add-subject-btn-modal').addEventListener('click', handleAddSubjectInModal);
+                DOM.formModalBody.querySelector('#add-assessment-btn-modal').addEventListener('click', handleAddAssessmentInModal);
+            }
+
+            function renderSubjectsListInModal() {
+                const listDiv = DOM.formModalBody.querySelector('#subjects-list-modal-div');
+                if (!listDiv) return; 
+                listDiv.innerHTML = (currentRegisterData.subjects || []).map(s => `
+                    <div class="d-flex align-items-center mb-1" data-id="${s.id}">
+                        <input type="text" value="${s.name}" placeholder="${L.subjectName}" class="mr-1 subject-name-input" style="flex-grow:1;">
+                        <input type="number" value="${s.maxMarks || ''}" placeholder="${L.maxMarks}" class="mr-1 subject-max-marks-input" style="width:100px;">
+                        <button type="button" class="delete-subject-btn-modal sm danger">${L.delete}</button>
+                    </div>
+                `).join('');
+                
+                listDiv.querySelectorAll('.subject-name-input, .subject-max-marks-input').forEach(input => {
+                    input.addEventListener('change', handleEditSubjectInModal);
+                });
+                listDiv.querySelectorAll('.delete-subject-btn-modal').forEach(btn => {
+                    btn.addEventListener('click', handleDeleteSubjectInModal);
+                });
+            }
+            
+            function renderAssessmentsListInModal() {
+                const listDiv = DOM.formModalBody.querySelector('#assessments-list-modal-div');
+                 if (!listDiv) return; 
+                listDiv.innerHTML = (currentRegisterData.assessmentTypes || []).map(a => `
+                    <div class="d-flex align-items-center mb-1" data-id="${a.id}">
+                        <input type="text" value="${a.name}" placeholder="${L.assessmentName}" class="mr-1 assessment-name-input" style="flex-grow:1;">
+                        <input type="number" value="${a.maxMarks || ''}" placeholder="${L.assessmentMaxMarks}" class="mr-1 assessment-max-marks-input" style="width:100px;">
+                        <button type="button" class="delete-assessment-btn-modal sm danger">${L.delete}</button>
+                    </div>
+                `).join('');
+
+                listDiv.querySelectorAll('.assessment-name-input, .assessment-max-marks-input').forEach(input => {
+                    input.addEventListener('change', handleEditAssessmentInModal);
+                });
+                listDiv.querySelectorAll('.delete-assessment-btn-modal').forEach(btn => {
+                    btn.addEventListener('click', handleDeleteAssessmentInModal);
+                });
+            }
+
+            function handleAddSubjectInModal() {
+                if (!currentRegisterData.subjects) currentRegisterData.subjects = [];
+                currentRegisterData.subjects.push({ id: Utils.generateUUID(), name: "", maxMarks: null });
+                renderSubjectsListInModal();
+                Utils.setUnsavedChanges(true);
+            }
+            function handleAddAssessmentInModal() {
+                if (!currentRegisterData.assessmentTypes) currentRegisterData.assessmentTypes = [];
+                currentRegisterData.assessmentTypes.push({ id: Utils.generateUUID(), name: "", maxMarks: null });
+                renderAssessmentsListInModal();
+                Utils.setUnsavedChanges(true);
+            }
+
+            function handleEditSubjectInModal(event) {
+                const input = event.target;
+                const id = input.closest('div').dataset.id;
+                const subject = currentRegisterData.subjects.find(s => s.id === id);
+                if (subject) {
+                    if (input.classList.contains('subject-name-input')) subject.name = input.value;
+                    if (input.classList.contains('subject-max-marks-input')) subject.maxMarks = input.value ? parseFloat(input.value) : null;
+                    Utils.setUnsavedChanges(true);
+                }
+            }
+             function handleEditAssessmentInModal(event) {
+                const input = event.target;
+                const id = input.closest('div').dataset.id;
+                const assessment = currentRegisterData.assessmentTypes.find(a => a.id === id);
+                if (assessment) {
+                    if (input.classList.contains('assessment-name-input')) assessment.name = input.value;
+                    if (input.classList.contains('assessment-max-marks-input')) assessment.maxMarks = input.value ? parseFloat(input.value) : null;
+                    Utils.setUnsavedChanges(true);
+                }
+            }
+
+            function handleDeleteSubjectInModal(event) {
+                const id = event.target.closest('div').dataset.id;
+                currentRegisterData.subjects = currentRegisterData.subjects.filter(s => s.id !== id);
+                renderSubjectsListInModal();
+                Utils.setUnsavedChanges(true);
+            }
+            function handleDeleteAssessmentInModal(event) {
+                const id = event.target.closest('div').dataset.id;
+                currentRegisterData.assessmentTypes = currentRegisterData.assessmentTypes.filter(a => a.id !== id);
+                renderAssessmentsListInModal();
+                Utils.setUnsavedChanges(true);
+            }
+
+            function init() {
+                DOM.configureSubjectsAssessmentsButton.addEventListener('click', handleConfigureSubjectsAssessments);
+                DOM.marksFilterSubject.addEventListener('change', (e) => {
+                    selectedSubjectFilter = e.target.value;
+                    renderMarksTable();
+                });
+                DOM.marksFilterAssessment.addEventListener('change', (e) => {
+                    selectedAssessmentFilter = e.target.value;
+                    renderMarksTable();
+                });
+                DOM.printMarksButton.addEventListener("click", () => {
+                     ReportGenerator.printSection(DOM.marksTab, L.marksRegister);
+                });
+            }
+            
+            function loadCurrentSettings() { 
+                populateFilterDropdowns(); 
+                renderMarksTable();
+            }
+
+            return { init, renderMarksTable, loadCurrentSettings, populateFilterDropdowns };
+        })();
+        
+
+        // --- Summary & Statistics Module --- (Placeholder, needs detailed implementation)
+        const SummaryStats = (() => {
+            function renderSummary() {
+                if (!currentRegisterData || !currentRegisterData.students || currentRegisterData.students.length === 0) {
+                    DOM.overallSummaryContent.innerHTML = `<p>${L.noDataAvailable}</p>`;
+                    return;
+                }
+                // This is a placeholder. A full summary would involve:
+                // 1. Class-wide attendance percentages.
+                // 2. Subject-wise class averages, pass/fail counts.
+                // 3. Overall class performance.
+                // 4. Highlighting students with low attendance or failing multiple subjects.
+                
+                // Example: Simple student list with overall attendance and marks %
+                let summaryHtml = `<h4>${L.studentPerformanceOverview}</h4>`; // Add this string to L
+                summaryHtml += `<table class="summary-table"><thead><tr><th>${L.rollNumber}</th><th>${L.studentName}</th><th>${L.attendancePercentage}</th><th>${L.marksPercentage} (${L.total})</th><th>${L.grade} (${L.total})</th></tr></thead><tbody>`;
+
+                const today = new Date();
+                const currentMonthStr = Utils.formatDate(today).substring(0,7); // For current month attendance stats
+
+                currentRegisterData.students.forEach(student => {
+                    // Attendance Calc (simplified for current month only for this example)
+                    let present = 0, markedDays = 0;
+                    const studentAttendanceMonth = currentRegisterData.attendance?.[student.id]?.[currentMonthStr];
+                    if (studentAttendanceMonth) {
+                        Object.values(studentAttendanceMonth).forEach(status => {
+                            if (status === 'P') present++;
+                            if (status !== 'H' && status !== 'X') markedDays++;
+                        });
+                    }
+                    const attPerc = markedDays > 0 ? (present / markedDays * 100).toFixed(1) : 'N/A';
+
+                    // Marks Calc (overall)
+                    let totalObtained = 0, totalMax = 0;
+                    if (currentRegisterData.marks?.[student.id] && currentRegisterData.subjects && currentRegisterData.assessmentTypes) {
+                        currentRegisterData.subjects.forEach(sbj => {
+                            currentRegisterData.assessmentTypes.forEach(asm => {
+                                const mark = currentRegisterData.marks[student.id]?.[sbj.id]?.[asm.id];
+                                if (typeof mark === 'number') totalObtained += mark;
+                                if (asm.maxMarks) totalMax += parseFloat(asm.maxMarks);
+                            });
+                        });
+                    }
+                    const marksPerc = totalMax > 0 ? (totalObtained / totalMax * 100).toFixed(1) : 'N/A';
+                    const grade = marksPerc !== 'N/A' ? Utils.calculateGrade(parseFloat(marksPerc)) : 'N/A';
+                    
+                    summaryHtml += `<tr>
+                        <td>${student.rollNo}</td>
+                        <td>${student.name}</td>
+                        <td class="${parseFloat(attPerc) < appSettings.lowAttendanceThreshold ? 'low-attendance' : ''}">${attPerc}%</td>
+                        <td class="${parseFloat(marksPerc) < appSettings.passingMarksPercentage ? 'failing-mark' : ''}">${marksPerc}% (${totalObtained.toFixed(1)}/${totalMax.toFixed(1)})</td>
+                        <td>${grade}</td>
+                    </tr>`;
+                });
+                summaryHtml += `</tbody></table>`;
+                DOM.overallSummaryContent.innerHTML = summaryHtml;
+                if (!L.studentPerformanceOverview) L.studentPerformanceOverview = "جائزہ کارکردگی طلباء"; // Add if missing
+            }
+
+            function init() {
+                DOM.printSummaryButton.addEventListener("click", () => {
+                    ReportGenerator.printSection(DOM.summaryStatsTab, L.summaryAndStatistics);
+                });
+            }
+            return { init, renderSummary };
+        })();
+
+        // --- Report Generator --- (Simplified: HTML reports, printable)
+        const ReportGenerator = (() => {
+            function initReportFilters() {
+                // Populate student select for student card report
+                DOM.reportStudentSelect.innerHTML = `<option value="">${L.selectStudentForReport}</option>`;
+                currentRegisterData?.students?.forEach(student => {
+                    DOM.reportStudentSelect.innerHTML += `<option value="${student.id}">${student.rollNo} - ${student.name}</option>`;
+                });
+                
+                // Set default date range (e.g., current academic year or month)
+                // For now, leave them blank or set to current month
+                const today = new Date();
+                const firstDayOfMonth = Utils.formatDate(new Date(today.getFullYear(), today.getMonth(), 1));
+                const lastDayOfMonth = Utils.formatDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+                DOM.reportStartDate.value = firstDayOfMonth;
+                DOM.reportEndDate.value = lastDayOfMonth;
+
+                toggleReportFilters(); // Show/hide filters based on selected report type
+            }
+
+            function toggleReportFilters() {
+                const reportType = DOM.reportTypeSelect.value;
+                DOM.studentReportFilter.classList.add('hidden');
+                DOM.dateRangeFilter.classList.add('hidden');
+
+                if (reportType === 'student_card') {
+                    DOM.studentReportFilter.classList.remove('hidden');
+                    DOM.dateRangeFilter.classList.remove('hidden'); // Student card might need date range for attendance summary
+                } else if (reportType === 'class_attendance_summary') {
+                    DOM.dateRangeFilter.classList.remove('hidden');
+                } else if (reportType === 'class_marks_summary') {
+                    // No specific filters here beyond what's already in register data for marks
+                }
+            }
+
+            function generateReport() {
+                const reportType = DOM.reportTypeSelect.value;
+                DOM.reportOutputArea.innerHTML = `<p>${L.loading}</p>`;
+
+                let reportHtml = "";
+                switch(reportType) {
+                    case 'student_card':
+                        reportHtml = generateStudentCardReport();
+                        break;
+                    case 'class_attendance_summary':
+                        reportHtml = generateClassAttendanceSummaryReport();
+                        break;
+                    case 'class_marks_summary':
+                        reportHtml = generateClassMarksSummaryReport();
+                        break;
+                    default:
+                        reportHtml = `<p>${L.reportOutputPlaceholder}</p>`;
+                }
+                DOM.reportOutputArea.innerHTML = reportHtml;
+                // Add a print button to the report output itself
+                if (reportHtml && !reportHtml.startsWith("<p>")) { // if a real report was generated
+                     DOM.reportOutputArea.innerHTML += `<button onclick="ReportGenerator.printSection(document.getElementById('report-output-area'), L.reports)" class="sm no-print mt-1">${L.printReport}</button>`;
+                }
+            }
+
+            function generateStudentCardReport() {
+                const studentId = DOM.reportStudentSelect.value;
+                if (!studentId) return `<p>${L.selectStudentForReport}</p>`;
+                const student = StudentManager.getStudentById(studentId);
+                if (!student) return `<p>${L.studentNotFound}</p>`; // Add L.studentNotFound
+
+                const startDate = DOM.reportStartDate.value;
+                const endDate = DOM.reportEndDate.value;
+
+                let html = `<h3>${L.studentCard} - ${student.name} (${student.rollNo})</h3>`;
+                html += `<p><strong>${L.fatherName}:</strong> ${student.fatherName || '-'}</p>`;
+                
+                // Attendance Summary for student within date range
+                html += `<h4>${L.attendanceSummary} (${startDate} ${L.to} ${endDate})</h4>`; // Add L.to
+                if (!L.to) L.to = "تا";
+                if (!L.studentNotFound) L.studentNotFound = "طالب علم نہیں ملا۔";
+
+                let presentDays = 0, absentDays = 0, leaveDays = 0, totalSchoolDays = 0;
+                // Iterate through dates in range
+                let currentDate = new Date(startDate);
+                const lastDate = new Date(endDate);
+                while(currentDate <= lastDate) {
+                    const dateStr = Utils.formatDate(currentDate);
+                    const monthStr = dateStr.substring(0,7);
+                    const dayInMonthStr = dateStr.substring(8,10);
+                    const status = currentRegisterData.attendance?.[studentId]?.[monthStr]?.[dayInMonthStr];
+                    
+                    if (status && status !== 'H' && status !== 'X') totalSchoolDays++; // Count actual school days for student
+                    if (status === 'P') presentDays++;
+                    else if (status === 'A') absentDays++;
+                    else if (status === 'L') leaveDays++;
+                    
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                const attPerc = totalSchoolDays > 0 ? (presentDays / totalSchoolDays * 100).toFixed(1) : 0;
+                html += `<p>${L.totalPresent}: ${presentDays}, ${L.totalAbsent}: ${absentDays}, ${L.totalLeave}: ${leaveDays}</p>`;
+                html += `<p>${L.attendancePercentage}: ${attPerc}% (${L.outOf} ${totalSchoolDays} ${L.days})</p>`; // Add L.outOf, L.days
+                 if (!L.outOf) L.outOf = "کل";
+                 if (!L.days) L.days = "دن";
+
+
+                // Marks Summary for student
+                html += `<h4>${L.marksSummary}</h4>`;
+                if (currentRegisterData.subjects?.length && currentRegisterData.assessmentTypes?.length) {
+                    html += `<table border="1" style="width:100%; border-collapse:collapse;"><thead><tr><th>${L.subjectName}</th>`;
+                    currentRegisterData.assessmentTypes.forEach(asm => html += `<th>${asm.name} (${asm.maxMarks || '-'})</th>`);
+                    html += `<th>${L.total}</th><th>${L.percentage}</th><th>${L.grade}</th></tr></thead><tbody>`;
+
+                    let grandTotalObtained = 0, grandTotalMax = 0;
+                    currentRegisterData.subjects.forEach(sbj => {
+                        let subjectTotalObtained = 0, subjectTotalMax = 0;
+                        html += `<tr><td>${sbj.name}</td>`;
+                        currentRegisterData.assessmentTypes.forEach(asm => {
+                            const mark = currentRegisterData.marks?.[studentId]?.[sbj.id]?.[asm.id];
+                            html += `<td>${mark ?? '-'}</td>`;
+                            if (typeof mark === 'number') subjectTotalObtained += mark;
+                            if (asm.maxMarks) subjectTotalMax += parseFloat(asm.maxMarks);
+                        });
+                        const subjectPerc = subjectTotalMax > 0 ? (subjectTotalObtained / subjectTotalMax * 100).toFixed(1) : 0;
+                        const subjectGrade = Utils.calculateGrade(subjectPerc);
+                        html += `<td>${subjectTotalObtained}/${subjectTotalMax}</td><td>${subjectPerc}%</td><td>${subjectGrade}</td></tr>`;
+                        grandTotalObtained += subjectTotalObtained;
+                        grandTotalMax += subjectTotalMax;
+                    });
+                     const grandPerc = grandTotalMax > 0 ? (grandTotalObtained / grandTotalMax * 100).toFixed(1) : 0;
+                     const grandGrade = Utils.calculateGrade(grandPerc);
+                    html += `<tr><td colspan="${1 + currentRegisterData.assessmentTypes.length}"><strong>${L.total}</strong></td><td><strong>${grandTotalObtained}/${grandTotalMax}</strong></td><td><strong>${grandPerc}%</strong></td><td><strong>${grandGrade}</strong></td></tr>`;
+                    html += `</tbody></table>`;
+                } else {
+                    html += `<p>${L.noSubjectsForMarks}</p>`;
+                }
+                return html;
+            }
+            
+            function generateClassAttendanceSummaryReport() {
+                // This would be similar to the Attendance Tab's table but potentially for a custom date range
+                // For simplicity, let's use the current attendance tab's structure for the selected month
+                // Or one could build a more detailed report here.
+                // For now, let's make it simple: print the current view of attendance tab.
+                const attendanceTabClone = DOM.attendanceTab.cloneNode(true);
+                attendanceTabClone.querySelectorAll('.no-print').forEach(el => el.remove()); // Remove non-printable elements
+                return `<h3>${L.classAttendanceSummaryReport} (${DOM.attendanceMonthYear.value})</h3>` + attendanceTabClone.innerHTML;
+
+            }
+            function generateClassMarksSummaryReport() {
+                // Similar to Marks Tab
+                const marksTabClone = DOM.marksTab.cloneNode(true);
+                marksTabClone.querySelectorAll('.no-print').forEach(el => el.remove());
+                return `<h3>${L.classMarksSummaryReport}</h3>` + marksTabClone.innerHTML;
+            }
+            
+            function printSection(sectionElement, title) {
+                // Clone the section to avoid modifying the live DOM for print-specific changes
+                const printContent = sectionElement.cloneNode(true);
+                
+                // Remove elements marked as 'no-print' from the clone
+                printContent.querySelectorAll('.no-print').forEach(el => el.remove());
+                // Ensure contenteditable elements are not editable in print
+                printContent.querySelectorAll('[contenteditable="true"]').forEach(el => el.removeAttribute('contenteditable'));
+                // Simplify inputs to text display for printing
+                printContent.querySelectorAll('input, select, textarea').forEach(input => {
+                    const parent = input.parentNode;
+                    if (input.type === 'checkbox' || input.type === 'radio') {
+                        const text = document.createTextNode(input.checked ? `[${L.yes}]` : `[${L.no}]`);
+                        parent.replaceChild(text, input);
+                    } else if (input.tagName === 'SELECT') {
+                        const selectedOption = input.options[input.selectedIndex];
+                        const text = document.createTextNode(selectedOption ? selectedOption.text : '');
+                        parent.replaceChild(text, input);
+                    } else {
+                        const text = document.createTextNode(input.value);
+                        parent.replaceChild(text, input);
+                    }
+                });
+
+
+                DOM.printContentArea.innerHTML = `
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <h1>${currentRegisterData?.info?.schoolName || L.appName}</h1>
+                        <h2>${title}</h2>
+                        ${currentRegisterData?.info?.className ? `<p>${L.className}: ${currentRegisterData.info.className} ${currentRegisterData.info.sectionName || ''} - ${L.academicYear}: ${currentRegisterData.info.academicYear || ''}</p>` : ''}
+                    </div>
+                    ${printContent.innerHTML}
+                    <div style="text-align:center; margin-top:30px; font-size:0.8em;">
+                        <p>${L.generatedOn}: ${new Date().toLocaleString('ur-PK')}</p>
+                    </div>`;
+                if (!L.generatedOn) L.generatedOn = "تیار کردہ تاریخ";
+                
+                // Temporarily show the print area for the print dialog
+                DOM.printContentArea.classList.remove('hidden');
+                window.print();
+                DOM.printContentArea.classList.add('hidden'); // Hide again after printing
+                DOM.printContentArea.innerHTML = ''; // Clear it
+            }
+
+
+            function init() {
+                DOM.reportTypeSelect.addEventListener('change', toggleReportFilters);
+                DOM.generateReportButton.addEventListener('click', generateReport);
+            }
+
+            return { init, generateReport, printSection, initReportFilters };
+        })();
+        
+        // --- Data Import/Export ---
+        const DataIO = (() => {
+            function exportRegisterToJson() {
+                if (!currentRegisterId || !currentRegisterData) {
+                    UIRenderer.displayMessage(L.noRegisterSelected || "کوئی رجسٹر منتخب نہیں ہے۔", "warning");
+                    if (!L.noRegisterSelected) L.noRegisterSelected = "کوئی رجسٹر منتخب نہیں ہے۔";
+                    return;
+                }
+                const dataStr = JSON.stringify({ meta: currentRegisterData.info, data: currentRegisterData }, null, 2);
+                const blob = new Blob([dataStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                const safeName = (currentRegisterData.info.name || "register").replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                a.download = `${safeName}_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                UIRenderer.displayMessage(L.dataExportedSuccessfully + a.download, "success");
+            }
+
+            function importRegisterFromJson(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        // Validate imported structure (basic check)
+                        if (!imported.meta || !imported.data || !imported.data.students) { // Add more checks as needed
+                            throw new Error("Invalid register file format.");
+                        }
+                        
+                        // Create a new register with imported data
+                        const newRegisterMeta = {
+                            id: Utils.generateUUID(),
+                            name: imported.meta.name ? `${imported.meta.name} (${L.imported || 'درآمد شدہ'})` : `${L.newRegister} (${L.imported || 'درآمد شدہ'})`,
+                            createdAt: new Date().toISOString(),
+                            lastModifiedAt: new Date().toISOString(),
+                            // Copy other meta fields if they exist
+                            schoolName: imported.meta.schoolName,
+                            className: imported.meta.className,
+                            sectionName: imported.meta.sectionName,
+                            teacherName: imported.meta.teacherName,
+                            academicYear: imported.meta.academicYear,
+                            logo: imported.meta.logo, // This might be base64 string
+                        };
+                        if (!L.imported) L.imported = "درآمد شدہ";
+                        if (!L.newRegister) L.newRegister = "نیا رجسٹر";
+
+                        const newRegisterFullData = {
+                            id: newRegisterMeta.id,
+                            info: { ...newRegisterMeta, ...imported.meta }, // Merge, prioritizing imported meta details
+                            students: imported.data.students || [],
+                            attendance: imported.data.attendance || {},
+                            marks: imported.data.marks || {},
+                            subjects: imported.data.subjects || [],
+                            assessmentTypes: imported.data.assessmentTypes || [],
+                            settings: imported.data.settings || {}
+                        };
+                        newRegisterFullData.info.id = newRegisterMeta.id; // Ensure info.id matches meta.id
+                        newRegisterFullData.info.name = newRegisterMeta.name; // Ensure name is the new "imported" name
+
+                        await DBLib.addRegisterMeta(newRegisterMeta);
+                        await DBLib.putRegisterData(newRegisterFullData);
+                        
+                        await RegisterSwitcher.loadRegisters(); // Refresh register list
+                        UIRenderer.displayMessage(L.dataImportedSuccessfully, "success");
+                        // Optionally, switch to the newly imported register
+                        // App.switchRegister(newRegisterMeta.id);
+
+                    } catch (err) {
+                        console.error("Error importing JSON:", err);
+                        UIRenderer.displayMessage(L.errorImportingData + err.message, "error");
+                    } finally {
+                        DOM.importRegisterFile.value = ""; // Reset file input
+                    }
+                };
+                reader.readAsText(file);
+            }
+            
+            function exportRegisterToHtml() {
+                 if (!currentRegisterId || !currentRegisterData) {
+                    UIRenderer.displayMessage(L.noRegisterSelected || "کوئی رجسٹر منتخب نہیں ہے۔", "warning");
+                    return;
+                }
+                // Collate all relevant data into a single printable HTML structure
+                // This will be a large string of HTML including header, students, attendance for current month, and marks.
+                
+                let html = `<html lang="ur" dir="rtl"><head><meta charset="UTF-8"><title>${currentRegisterData.info.name || L.appName}</title>`;
+                // Embed critical styles directly for portability if needed, or link to a print.css
+                // For single file export, better to embed. Using existing styles via @media print is fine for direct printing.
+                // For exporting a file, styles might need to be inlined or embedded.
+                // This example will rely on the browser's print using existing styles.
+                // A more robust HTML export would inline crucial CSS.
+
+                html += `<style>
+                    body { font-family: var(--font-family-urdu); direction: rtl; margin: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                    th, td { border: 1px solid #ccc; padding: 5px; text-align: right; vertical-align: middle; }
+                    th { background-color: #f0f0f0; font-weight: bold; }
+                    .attendance-P { background-color: #e9f5e9 !important; } 
+                    .attendance-A { background-color: #fbe9e9 !important; } 
+                    .attendance-L { background-color: #fff8e9 !important; }
+                    .attendance-H { background-color: #e9f8fb !important; }
+                    .failing-mark { background-color: #fbe9e9 !important; }
+                    h1,h2,h3,h4 { text-align: center; }
+                    /* Add more minimal styles needed for the exported HTML file */
+                </style></head><body>`;
+
+                // Register Header
+                html += `<h1>${currentRegisterData.info.schoolName || ''}</h1>`;
+                html += `<h2>${currentRegisterData.info.name || L.appName}</h2>`;
+                html += `<p style="text-align:center;">${L.className}: ${currentRegisterData.info.className || ''} | ${L.sectionName}: ${currentRegisterData.info.sectionName || ''} | ${L.teacherName}: ${currentRegisterData.info.teacherName || ''} | ${L.academicYear}: ${currentRegisterData.info.academicYear || ''}</p>`;
+                if (currentRegisterData.info.logo) {
+                    html += `<div style="text-align:center;"><img src="${currentRegisterData.info.logo}" alt="${L.schoolLogo}" style="max-height:80px; margin-bottom:10px;"></div>`;
+                }
+
+                // Students List (simplified)
+                html += `<h3>${L.studentsList}</h3>`;
+                const studentsClone = DOM.studentsTab.cloneNode(true);
+                studentsClone.querySelectorAll('.no-print, button, input[type="search"]').forEach(el => el.remove());
+                html += studentsClone.querySelector('#students-table').outerHTML;
+
+                // Attendance (current view)
+                html += `<h3>${L.attendanceRegister} (${DOM.attendanceMonthYear.value})</h3>`;
+                const attendanceClone = DOM.attendanceTab.cloneNode(true);
+                attendanceClone.querySelectorAll('.no-print, select, input, button').forEach(el => el.remove());
+                html += attendanceClone.querySelector('#attendance-table').outerHTML;
+
+                // Marks (current view)
+                html += `<h3>${L.marksRegister}</h3>`;
+                const marksClone = DOM.marksTab.cloneNode(true);
+                marksClone.querySelectorAll('.no-print, select, button').forEach(el => el.remove());
+                // For marks inputs, we need their values, not the input fields themselves.
+                const marksTableForExport = marksClone.querySelector('#marks-table').cloneNode(true);
+                marksTableForExport.querySelectorAll('input.marks-input').forEach(inp => {
+                    const val = inp.value;
+                    const parentTd = inp.parentNode;
+                    parentTd.textContent = val; // Replace input with its value
+                });
+                html += marksTableForExport.outerHTML;
+                
+                html += `</body></html>`;
+
+                const blob = new Blob([html], { type: "text/html" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                const safeName = (currentRegisterData.info.name || "register_export").replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                a.download = `${safeName}_${new Date().toISOString().split('T')[0]}.html`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                UIRenderer.displayMessage(L.dataExportedSuccessfully + a.download, "success");
+            }
+
+
+            function init() {
+                DOM.exportRegisterJsonButton.addEventListener("click", exportRegisterToJson);
+                DOM.importRegisterFile.addEventListener("change", importRegisterFromJson);
+                DOM.importRegisterButton.addEventListener("click", () => DOM.importRegisterFile.click()); // Trigger file input
+                DOM.exportRegisterHtmlButton.addEventListener("click", exportRegisterToHtml);
+            }
+            return { init };
+        })();
+        
+        // --- Register Switcher & Management ---
+        const RegisterSwitcher = (() => {
+            async function loadRegisters() {
+                const metas = await DBLib.getAllRegisterMetas();
+                DOM.registerSelect.innerHTML = ''; // Clear existing options
+                if (metas && metas.length > 0) {
+                    metas.sort((a,b) => (a.name || "").localeCompare(b.name || "")); // Sort by name
+                    metas.forEach(meta => {
+                        const option = document.createElement('option');
+                        option.value = meta.id;
+                        option.textContent = meta.name || L.unnamedRegister || "بے نام رجسٹر";
+                        if (meta.id === currentRegisterId) {
+                            option.selected = true;
+                        }
+                        DOM.registerSelect.appendChild(option);
+                    });
+                    DOM.currentRegisterActions.classList.remove('hidden');
+                } else {
+                    const option = document.createElement('option');
+                    option.textContent = L.noRegistersFound;
+                    option.disabled = true;
+                    DOM.registerSelect.appendChild(option);
+                    DOM.currentRegisterActions.classList.add('hidden');
+                    DOM.mainContent.classList.add('hidden'); // Hide main content if no registers
+                }
+                if (!L.unnamedRegister) L.unnamedRegister = "بے نام رجسٹر";
+            }
+
+            async function createNewRegister() {
+                const formHtml = `
+                    <form id="new-register-form">
+                        <div class="form-group">
+                            <label for="form-reg-name">${L.registerName}</label>
+                            <input type="text" id="form-reg-name" name="registerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-reg-school-name">${L.schoolName}</label>
+                            <input type="text" id="form-reg-school-name" name="schoolName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-reg-class-name">${L.className}</label>
+                            <input type="text" id="form-reg-class-name" name="className" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-reg-section-name">${L.sectionName}</label>
+                            <input type="text" id="form-reg-section-name" name="sectionName">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-reg-teacher-name">${L.teacherName}</label>
+                            <input type="text" id="form-reg-teacher-name" name="teacherName">
+                        </div>
+                        <div class="form-group">
+                            <label for="form-reg-academic-year">${L.academicYear}</label>
+                            <input type="text" id="form-reg-academic-year" name="academicYear" placeholder="مثلاً 2023-2024" required>
+                        </div>
+                    </form>
+                `;
+                ModalManager.showFormModal(L.createNewRegister, formHtml, async (formData) => {
+                    const newId = Utils.generateUUID();
+                    const now = new Date().toISOString();
+                    const newMeta = {
+                        id: newId,
+                        name: formData.get("registerName"),
+                        schoolName: formData.get("schoolName"),
+                        className: formData.get("className"),
+                        sectionName: formData.get("sectionName"),
+                        teacherName: formData.get("teacherName"),
+                        academicYear: formData.get("academicYear"),
+                        createdAt: now,
+                        lastModifiedAt: now,
+                        logo: null // Default no logo
+                    };
+                    const newRegData = {
+                        id: newId,
+                        info: { ...newMeta }, // info is mostly same as meta for a new register
+                        students: [],
+                        attendance: {},
+                        marks: {},
+                        subjects: [], // Default empty subjects
+                        assessmentTypes: [], // Default empty assessment types
+                        settings: { // Default settings for a new register
+                            attendanceMarkingStyle: 'tick_cross',
+                            currentAttendanceMonth: Utils.formatDate(new Date()).substring(0, 7)
+                        }
+                    };
+
+                    await DBLib.addRegisterMeta(newMeta);
+                    await DBLib.putRegisterData(newRegData);
+                    await loadRegisters();
+                    App.switchRegister(newId); // Switch to the newly created register
+                    ModalManager.hideFormModal();
+                    UIRenderer.displayMessage(L.operationSuccessful, "success");
+                });
+            }
+            
+            async function renameRegister() {
+                if (!currentRegisterId || !currentRegisterData) return;
+                const oldName = currentRegisterData.info.name;
+                const newName = prompt(L.enterNewRegisterName, oldName);
+                if (newName && newName.trim() !== "" && newName !== oldName) {
+                    currentRegisterData.info.name = newName;
+                    // Also update meta store
+                    const meta = await DBLib.getRegisterMeta(currentRegisterId);
+                    if (meta) {
+                        meta.name = newName;
+                        meta.lastModifiedAt = new Date().toISOString();
+                        await DBLib.putRegisterMeta(meta);
+                    }
+                    await DBLib.putRegisterData(currentRegisterData); // Save updated data with new name in info
+                    await loadRegisters(); // Refresh dropdown
+                    UIRenderer.updateRegisterHeaderDisplay(); // Update header display
+                    UIRenderer.displayMessage(L.operationSuccessful, "success");
+                }
+            }
+            
+            async function cloneRegister() {
+                if (!currentRegisterId || !currentRegisterData) return;
+                
+                const originalName = currentRegisterData.info.name;
+                const newCloneName = prompt(L.enterNewRegisterName, `${originalName} (${L.clone || 'نقل'})`);
+                if (!newCloneName || newCloneName.trim() === "") return;
+                if (!L.clone) L.clone = "نقل";
+
+                const newId = Utils.generateUUID();
+                const now = new Date().toISOString();
+
+                const clonedMeta = {
+                    ...currentRegisterData.info, // Copy all info fields
+                    id: newId,
+                    name: newCloneName,
+                    createdAt: now,
+                    lastModifiedAt: now,
+                };
+
+                const clonedData = {
+                    ...currentRegisterData, // Deep copy students, attendance, marks etc.
+                    id: newId,
+                    info: { ...clonedMeta }, // New info for the cloned data
+                };
+                // Ensure students get new IDs if we want them to be fully independent entities
+                // For a simple clone, keeping student IDs might be fine if they are considered part of this register's data set.
+                // If students were globally unique, then new IDs would be essential.
+                // For this app structure, student IDs are unique within a register's context.
+                // When cloning, it is usually better to generate new IDs for students to avoid future conflicts if merging or complex operations.
+                // This is a simplification for now:
+                // clonedData.students = currentRegisterData.students.map(s => ({...s, id: Utils.generateUUID() }));
+                // And then update attendance and marks keys. This is complex.
+                // For a simpler clone, we deep copy.
+                clonedData.students = JSON.parse(JSON.stringify(currentRegisterData.students));
+                clonedData.attendance = JSON.parse(JSON.stringify(currentRegisterData.attendance));
+                clonedData.marks = JSON.parse(JSON.stringify(currentRegisterData.marks));
+                // Subjects and assessment types are also part of register data
+                clonedData.subjects = JSON.parse(JSON.stringify(currentRegisterData.subjects));
+                clonedData.assessmentTypes = JSON.parse(JSON.stringify(currentRegisterData.assessmentTypes));
+                clonedData.settings = JSON.parse(JSON.stringify(currentRegisterData.settings || {}));
+
+
+                await DBLib.addRegisterMeta(clonedMeta);
+                await DBLib.putRegisterData(clonedData);
+                await loadRegisters();
+                App.switchRegister(newId); // Switch to cloned register
+                UIRenderer.displayMessage(L.operationSuccessful, "success");
+            }
+
+            async function deleteCurrentRegister() {
+                if (!currentRegisterId) return;
+                ModalManager.showGenericModal(L.confirmDeleteRegister, `${L.confirmDeleteRegister} (${currentRegisterData.info.name || L.unnamedRegister})?`, async () => {
+                    await DBLib.deleteRegisterMeta(currentRegisterId);
+                    await DBLib.deleteRegisterData(currentRegisterId);
+                    currentRegisterId = null;
+                    currentRegisterData = null;
+                    await loadRegisters();
+                    // Try to switch to another register if one exists, or show "no registers"
+                    const firstRegisterOption = DOM.registerSelect.options[0];
+                    if (firstRegisterOption && !firstRegisterOption.disabled) {
+                        App.switchRegister(firstRegisterOption.value);
+                    } else {
+                        DOM.mainContent.classList.add('hidden');
+                        UIRenderer.updateRegisterHeaderDisplay(); // Clear display
+                    }
+                    UIRenderer.displayMessage(L.operationSuccessful, "success");
+                });
+            }
+
+            async function resetApplicationData() {
+                ModalManager.showGenericModal(L.confirmResetAppData, L.confirmResetAppData, async () => {
+                    try {
+                        await DBLib.resetAllData();
+                        currentRegisterId = null;
+                        currentRegisterData = null;
+                        appSettings = { theme: "light", lowAttendanceThreshold: 75, passingMarksPercentage: 40 }; // Reset to defaults
+                        await DBLib.putAppSettings(appSettings); // Save default settings
+                        ThemeManager.applyTheme(appSettings.theme);
+                        await loadRegisters(); // Will show "no registers"
+                        DOM.mainContent.classList.add('hidden');
+                        UndoRedoManager.clearStacks();
+                        UIRenderer.updateRegisterHeaderDisplay();
+                        UIRenderer.displayMessage(L.operationSuccessful, "success");
+                    } catch (err) {
+                         console.error("Error resetting app data:", err);
+                         UIRenderer.displayMessage(L.errorOccurred + err.message, "error");
+                    }
+                });
+            }
+
+            function init() {
+                DOM.manageRegistersButton.addEventListener('click', () => {
+                    DOM.registerManagementSection.classList.toggle('hidden');
+                });
+                DOM.createNewRegisterButton.addEventListener("click", createNewRegister);
+                DOM.switchRegisterButton.addEventListener("click", () => {
+                    const selectedId = DOM.registerSelect.value;
+                    if (selectedId && selectedId !== currentRegisterId) {
+                        App.switchRegister(selectedId);
+                    }
+                });
+                DOM.renameRegisterButton.addEventListener("click", renameRegister);
+                DOM.cloneRegisterButton.addEventListener("click", cloneRegister);
+                DOM.deleteRegisterButton.addEventListener("click", deleteCurrentRegister);
+                DOM.resetAppDataButton.addEventListener("click", resetApplicationData);
+            }
+            return { init, loadRegisters };
+        })();
+
+        // --- Main App Logic ---
+                // --- Main App Logic ---
+        const App = (() => {
+            // Global script-level variables (currentRegisterId, currentRegisterData, appSettings, unsavedChangesExist)
+            // are used directly by this module's methods, ensuring a single source of truth.
+
+            async function initialize() {
+                UIRenderer.setAllStrings();
+                ModalManager.init();
+                ContextMenuManager.init();
+                
+                try {
+                    await DBLib.init();
+                    const savedSettings = await DBLib.getAppSettings();
+                    if (savedSettings) {
+                        appSettings = { ...appSettings, ...savedSettings };
+                    } else {
+                        await DBLib.putAppSettings(appSettings);
+                    }
+                } catch (err) {
+                    console.error("DB initialization or settings load error:", err);
+                    UIRenderer.displayMessage(L.error + "ڈیٹا بیس شروع کرنے میں ناکامی۔ ایپ آف لائن کام نہیں کر سکتی۔", "error");
+                }
+
+                ThemeManager.init(); 
+                
+                RegisterSwitcher.init();
+                await RegisterSwitcher.loadRegisters(); 
+                RegisterHeader.init();
+                StudentManager.init();
+                AttendanceManager.init(); // Calls the modified init which defers its listener
+                MarksManager.init();
+                SummaryStats.init();
+                ReportGenerator.init();
+                DataIO.init();
+
+                const lastRegisterId = appSettings.lastOpenedRegisterId;
+                let initialRegisterToLoad = null;
+
+                if (lastRegisterId) {
+                    const meta = await DBLib.getRegisterMeta(lastRegisterId);
+                    if (meta) initialRegisterToLoad = lastRegisterId;
+                }
+                
+                if (!initialRegisterToLoad && DOM.registerSelect.options.length > 0 && !DOM.registerSelect.options[0].disabled) {
+                    initialRegisterToLoad = DOM.registerSelect.options[0].value;
+                }
+
+                if (initialRegisterToLoad) {
+                    setTimeout(async () => {
+                        try {
+                            await switchRegister(initialRegisterToLoad);
+                        } catch (e) {
+                            console.error("Error during deferred initial switchRegister:", e);
+                            UIRenderer.displayMessage(L.error + "ابتدائی رجسٹر لوڈ کرنے میں ناکامی۔", "error");
+                        }
+                    }, 0);
+                } else {
+                    DOM.mainContent.classList.add('hidden');
+                    setTimeout(() => { 
+                        UIRenderer.updateRegisterHeaderDisplay();
+                    }, 0);
+                }
+                
+                DOM.tabs.forEach(button => {
+                    button.addEventListener("click", () => {
+                        UIRenderer.activateTab(button.dataset.tab);
+                    });
+                });
+                DOM.lowAttendanceThresholdInput.value = appSettings.lowAttendanceThreshold;
+                DOM.passingMarksPercentageInput.value = appSettings.passingMarksPercentage;
+                DOM.saveAppSettingsButton.addEventListener('click', saveAppSettings);
+                window.addEventListener('beforeunload', (event) => {
+                    if (unsavedChangesExist) { 
+                        event.preventDefault();
+                        event.returnValue = L.unsavedChanges; 
+                        return L.unsavedChanges; 
+                    }
+                });
+                DOM.tabs.forEach(button => { 
+                    button.addEventListener("click", async () => {
+                        if (unsavedChangesExist && currentRegisterData) { 
+                            await saveCurrentRegisterData(); 
+                        }
+                    });
+                });
+            }
+
+            async function switchRegister(registerIdParam) {
+                if (unsavedChangesExist && currentRegisterData) {
+                    await saveCurrentRegisterData();
+                }
+
+                const registerDataFromDB = await DBLib.getRegisterData(registerIdParam);
+                if (registerDataFromDB) {
+                    currentRegisterId = registerIdParam;
+                    currentRegisterData = registerDataFromDB;
+                    
+                    if (!currentRegisterData.info) currentRegisterData.info = {};
+                    if (!currentRegisterData.students) currentRegisterData.students = [];
+                    if (!currentRegisterData.attendance) currentRegisterData.attendance = {};
+                    if (!currentRegisterData.marks) currentRegisterData.marks = {};
+                    if (!currentRegisterData.subjects) currentRegisterData.subjects = [];
+                    if (!currentRegisterData.assessmentTypes) currentRegisterData.assessmentTypes = [];
+                    if (!currentRegisterData.settings) currentRegisterData.settings = {};
+
+                    appSettings.lastOpenedRegisterId = currentRegisterId;
+                    await DBLib.putAppSettings(appSettings); 
+
+                    DOM.mainContent.classList.remove('hidden');
+                    DOM.registerSelect.value = currentRegisterId; 
+                    
+                    UndoRedoManager.clearStacks(); 
+                    Utils.setUnsavedChanges(false); 
+                    DOM.currentRegisterActions.classList.remove('hidden');
+
+                    RegisterHeader.updateDisplay();
+                    StudentManager.renderStudentTable();
+                    AttendanceManager.loadCurrentSettings(); 
+                    AttendanceManager.renderAttendanceGrid(); 
+                    MarksManager.loadCurrentSettings(); 
+                    SummaryStats.renderSummary(); 
+                    ReportGenerator.initReportFilters(); 
+                    
+                    UIRenderer.activateTab('students-tab'); 
+
+                } else {
+                    console.error("Failed to load register data for ID:", registerIdParam);
+                    UIRenderer.displayMessage(L.error + "رجسٹر ڈیٹا لوڈ کرنے میں ناکامی۔", "error");
+                    DOM.mainContent.classList.add('hidden');
+                    UIRenderer.updateRegisterHeaderDisplay(); 
+                }
+            }
+
+            async function saveCurrentRegisterData() {
+                if (currentRegisterId && currentRegisterData) {
+                    try {
+                        currentRegisterData.info.lastModifiedAt = new Date().toISOString();
+                        await DBLib.putRegisterData(currentRegisterData); 
+
+                        const meta = await DBLib.getRegisterMeta(currentRegisterId);
+                        if (meta) {
+                            let metaNeedsUpdate = false;
+                            if (meta.name !== currentRegisterData.info.name) {
+                                meta.name = currentRegisterData.info.name;
+                                metaNeedsUpdate = true;
+                            }
+                            if (meta.lastModifiedAt !== currentRegisterData.info.lastModifiedAt) {
+                               meta.lastModifiedAt = currentRegisterData.info.lastModifiedAt;
+                               metaNeedsUpdate = true;
+                            }
+                            
+                            if (metaNeedsUpdate) {
+                                await DBLib.putRegisterMeta(meta);
+                            }
+                        }
+                        Utils.setUnsavedChanges(false); 
+                    } catch (err) { 
+                        console.error("Error saving register data:", err);
+                        UIRenderer.displayMessage(L.error + "رجسٹر ڈیٹا محفوظ کرنے میں ناکامی۔", "error");
+                    }
+                }
+            }
+            
+            async function saveAppSettings() {
+                appSettings.lowAttendanceThreshold = parseInt(DOM.lowAttendanceThresholdInput.value) || 75;
+                appSettings.passingMarksPercentage = parseInt(DOM.passingMarksPercentageInput.value) || 40;
+                try {
+                    await DBLib.putAppSettings(appSettings); 
+                    UIRenderer.displayMessage(L.operationSuccessful, "success");
+                    AttendanceManager.renderAttendanceGrid(); 
+                    MarksManager.renderMarksTable(); 
+                    SummaryStats.renderSummary();
+                } catch (err) {
+                    console.error("Error saving app settings:", err);
+                    UIRenderer.displayMessage(L.errorOccurred + err.message, "error");
+                }
+            }
+
+            return { initialize, switchRegister, saveCurrentRegisterData };
+        })();
+        // --- Application Start ---
+        document.addEventListener('DOMContentLoaded', App.initialize);
+
+    </script>
+</body>
+</html>

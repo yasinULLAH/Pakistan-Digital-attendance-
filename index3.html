@@ -1,0 +1,2364 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاضری اور نمبرات کا رجسٹر - یاسین اللہ</title>
+    <meta name="description" content="ایک مکمل آف لائن حاضری اور نمبرات کا رجسٹر جو IndexedDB پر مبنی ہے، طلباء کی حاضری اور نمبرات کو ٹریک کرنے کے لیے۔">
+    <meta name="keywords" content="حاضری رجسٹر, نمبرات رجسٹر, طلباء کا ڈیٹا, آف لائن ایپ, IndexedDB, اردو, یاسین اللہ, ماہانہ ریکارڈ, حاضری ٹریکر, نمبرات مینجمنٹ, ٹیبز, کولیپسیبل, آٹو سیو">
+    <meta name="author" content="Yasin Ullah">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --light-bg: #e9f5ff;
+            --dark-text: #004085;
+            --border-color: #cce0f0;
+            --table-header-bg: #e9f5ff;
+            --table-row-even-bg: #f9f9f9;
+            --table-row-odd-bg: #fff;
+            --total-row-bg: #f0f8ff;
+            --grand-total-row-bg: #d9edf7;
+            --container-bg: #fff;
+            --body-bg: #f4f7f6;
+            --button-padding: 10px 18px;
+            --input-padding: 10px;
+            --border-radius: 8px;
+            --font-size-base: 14px;
+            --font-size-small: 12px;
+            --font-size-large: 1.1em;
+            --tab-active-bg: var(--primary-color);
+            --tab-active-color: white;
+            --tab-inactive-bg: #f0f0f0;
+            --tab-inactive-color: #333;
+        }
+
+        body {
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--body-bg);
+            color: #333;
+            direction: rtl;
+            text-align: right;
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 100%;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        /* Tabs Styling */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            cursor: pointer;
+            background-color: var(--tab-inactive-bg);
+            color: var(--tab-inactive-color);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            margin-left: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-weight: bold;
+            font-size: var(--font-size-base);
+        }
+
+        .tab-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .tab-button.active {
+            background-color: var(--tab-active-bg);
+            color: var(--tab-active-color);
+            border-color: var(--tab-active-bg);
+            z-index: 1;
+            position: relative;
+            bottom: -2px; /* Overlap the border */
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            background-color: var(--container-bg);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Collapsible Sections */
+        .collapsible-header {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            padding: 12px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: var(--font-size-large);
+            transition: background-color 0.3s ease;
+        }
+
+        .collapsible-header:hover {
+            background-color: #d9edf7;
+        }
+
+        .collapsible-header::after {
+            content: '▼'; /* Down arrow */
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-header.active::after {
+            content: '▲'; /* Up arrow */
+            transform: rotate(180deg);
+        }
+
+        .collapsible-content {
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            margin-bottom: 20px;
+            display: none; /* Hidden by default */
+            overflow: hidden;
+            transition: max-height 0.3s ease-out; /* For smooth collapse */
+        }
+
+        .collapsible-content.show {
+            display: block;
+            max-height: 1000px; /* Arbitrary large value for smooth transition */
+        }
+
+        /* General Control Sections (reused from previous) */
+        .header-info, .register-controls, .monthly-controls, .dynamic-header-controls, .attendance-symbol-selector-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            gap: 15px;
+        }
+
+        .header-info div, .register-controls div, .monthly-controls div, .dynamic-header-controls div, .attendance-symbol-selector-section div {
+            flex: 1;
+            min-width: 180px;
+            margin-bottom: 10px;
+        }
+
+        .header-info label, .register-controls label, .monthly-controls label, .dynamic-header-controls label, .attendance-symbol-selector-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark-text);
+            font-size: 0.95em;
+        }
+
+        .header-info input[type="text"],
+        .register-controls input[type="text"],
+        .register-controls select,
+        .monthly-controls select,
+        .dynamic-header-controls input[type="text"],
+        .dynamic-header-controls input[type="number"],
+        .attendance-symbol-selector-section select {
+            width: 100%;
+            padding: var(--input-padding);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+            font-size: var(--font-size-base);
+            background-color: #fdfdfd;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .button-group button,
+        .register-controls button,
+        .monthly-controls button,
+        .dynamic-header-controls button,
+        .attendance-symbol-selector-section button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: var(--button-padding);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+            font-size: var(--font-size-base);
+            flex-grow: 1;
+            min-width: 120px;
+        }
+
+        .button-group button:hover,
+        .register-controls button:hover,
+        .monthly-controls button:hover,
+        .dynamic-header-controls button:hover,
+        .attendance-symbol-selector-section button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .button-group button:active,
+        .register-controls button:active,
+        .monthly-controls button:active,
+        .dynamic-header-controls button:active,
+        .attendance-symbol-selector-section button:active {
+            transform: translateY(0);
+        }
+
+        .button-group button.danger, .delete-student-btn { background-color: var(--danger-color); }
+        .button-group button.danger:hover, .delete-student-btn:hover { background-color: #c82333; }
+        .button-group button.success, .add-student-row button { background-color: var(--success-color); }
+        .button-group button.success:hover, .add-student-row button:hover { background-color: #218838; }
+        .button-group button.info { background-color: var(--info-color); }
+        .button-group button.info:hover { background-color: #138496; }
+        .button-group button.warning { background-color: var(--warning-color); color: #333; }
+        .button-group button.warning:hover { background-color: #e0a800; }
+        .button-group button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Marks Table Styling */
+        .marks-table-wrapper {
+            overflow-x: auto;
+            margin-top: 25px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+        }
+
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            min-width: 800px; /* Adjusted min-width for marks table */
+        }
+
+        .marks-table th, .marks-table td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .marks-table th {
+            background-color: var(--table-header-bg);
+            color: var(--dark-text);
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-size: 0.9em;
+        }
+
+        .marks-table td {
+            background-color: var(--table-row-odd-bg);
+        }
+        .marks-table tr:nth-child(even) td {
+            background-color: var(--table-row-even-bg);
+        }
+
+        .marks-table .student-name-col, .marks-table .student-roll-col {
+            text-align: right;
+            min-width: 150px;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .marks-table .student-name-col input, .marks-table .student-roll-col input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+            font-size: var(--font-size-base);
+            box-sizing: border-box;
+        }
+
+
+        .marks-table .total-col {
+            background-color: var(--total-row-bg);
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+
+        .marks-table .grand-total-row td {
+            background-color: var(--grand-total-row-bg);
+            font-weight: bold;
+            color: var(--dark-text);
+            font-size: var(--font-size-large);
+        }
+
+        .marks-cell input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            text-align: center;
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+            font-size: var(--font-size-base);
+            background-color: #fdfdfd;
+        }
+
+        .marks-table .add-student-row td {
+            background-color: #f0f0f0;
+            padding: 15px 10px;
+        }
+
+        .marks-table .add-student-row input {
+            width: calc(100% - 10px);
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+            font-size: var(--font-size-base);
+        }
+
+        .delete-student-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: var(--font-size-small);
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-student-btn:hover {
+            background-color: #c82333;
+        }
+
+        .summary-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-section h3 {
+            text-align: right;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-item {
+            background-color: var(--total-row-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+
+        .summary-item label {
+            font-weight: bold;
+            color: var(--dark-text);
+            font-size: 1em;
+        }
+
+        .summary-item span {
+            font-size: 1.2em;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .message-area {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 6px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: none;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .message-area.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        .message-area.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+
+        /* Undo/Redo buttons */
+        .undo-redo-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+        .undo-redo-buttons button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            transition: background-color 0.3s ease;
+        }
+        .undo-redo-buttons button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .undo-redo-buttons button:not(:disabled):hover {
+            opacity: 0.9;
+        }
+        .undo-redo-buttons button:first-child { /* Undo */
+            background-color: var(--warning-color);
+            color: #333;
+        }
+        .undo-redo-buttons button:last-child { /* Redo */
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        /* Logo Upload */
+        .logo-upload-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            padding: 10px;
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+        .logo-upload-section img {
+            max-height: 70px;
+            max-width: 150px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            background-color: #fff;
+            border-radius: 5px;
+            object-fit: contain;
+        }
+        .logo-upload-section input[type="file"] {
+            display: none;
+        }
+        .logo-upload-section label {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: var(--button-padding);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+            font-size: var(--font-size-base);
+        }
+        .logo-upload-section label:hover {
+            background-color: #5a6268;
+        }
+        .logo-upload-section button {
+            background-color: var(--danger-color);
+            color: white;
+            padding: var(--button-padding);
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease;
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+            font-size: var(--font-size-base);
+        }
+        .logo-upload-section button:hover {
+            background-color: #c82333;
+        }
+
+        /* Dynamic Header Controls */
+        .dynamic-header-controls {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .dynamic-header-controls .control-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 10px;
+            align-items: flex-end;
+        }
+        .dynamic-header-controls .control-row > div {
+            flex: 1;
+            min-width: 150px;
+        }
+        .dynamic-header-controls .control-row button {
+            flex-grow: 0;
+            min-width: 100px;
+        }
+
+        /* Attendance Grid Specific Styles */
+        .attendance-grid-container {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow-x: auto; /* Allow horizontal scrolling for the grid */
+            background-color: var(--table-row-odd-bg);
+        }
+
+        .attendance-grid-header {
+            display: grid;
+            /* grid-template-columns will be set by JS */
+            background-color: var(--table-header-bg);
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .attendance-grid-header > div {
+            padding: 10px;
+            border-left: 1px solid var(--border-color);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--dark-text);
+        }
+        .attendance-grid-header > div:first-child {
+            text-align: right;
+            border-right: 1px solid var(--border-color);
+            border-left: none;
+        }
+
+        .attendance-grid-body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .attendance-grid-row {
+            display: grid;
+            /* grid-template-columns will be set by JS */
+            border-bottom: 1px solid var(--border-color);
+        }
+        .attendance-grid-row:nth-child(even) {
+            background-color: var(--table-row-even-bg);
+        }
+
+        .attendance-grid-student-name {
+            padding: 10px;
+            border-right: 1px solid var(--border-color);
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .attendance-grid-cell {
+            padding: 5px;
+            border-left: 1px solid var(--border-color);
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 30px;
+            box-sizing: border-box;
+            transition: background-color 0.1s ease;
+        }
+        .attendance-grid-cell:hover {
+            background-color: #e0f0ff;
+        }
+        .attendance-grid-cell.present { color: var(--success-color); }
+        .attendance-grid-cell.absent { color: var(--danger-color); }
+        .attendance-grid-cell.leave { color: var(--warning-color); }
+        .attendance-grid-cell.tardy { color: var(--info-color); }
+
+        .attendance-grid-add-student-row {
+            display: grid;
+            /* grid-template-columns will be set by JS */
+            background-color: #f0f0f0;
+            padding: 15px 10px;
+            border-top: 1px solid var(--border-color);
+        }
+        .attendance-grid-add-student-row > div {
+            padding: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .attendance-grid-add-student-row input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Noto Nastaliq Urdu', sans-serif;
+            font-size: var(--font-size-base);
+            box-sizing: border-box;
+        }
+        .attendance-grid-add-student-row button {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            transition: background-color 0.3s ease;
+            flex-grow: 1;
+        }
+        .attendance-grid-add-student-row button:hover {
+            background-color: #218838;
+        }
+
+        /* Print specific styles */
+        @media print {
+            body {
+                padding: 0;
+                font-size: 10px;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+            .tabs, .tab-content, .collapsible-header, .collapsible-content,
+            .header-info, .register-controls, .monthly-controls, .dynamic-header-controls,
+            .attendance-symbol-selector-section, .message-area, .undo-redo-buttons,
+            .logo-upload-section, .add-student-row, .delete-student-btn {
+                display: none !important;
+            }
+            /* Only show relevant content for print */
+            #registerDetailsTabContent, #attendanceTabContent, #marksTabContent, #summaryTabContent {
+                display: block !important;
+                padding: 0;
+                border: none;
+            }
+            .collapsible-content.show {
+                display: block !important;
+                max-height: unset !important;
+                border: none;
+                padding: 0;
+            }
+            .collapsible-header {
+                display: block !important; /* Show header for context */
+                background-color: #f0f0f0;
+                border: 1px solid #ccc;
+                margin-bottom: 5px;
+                padding: 8px;
+                font-size: 12px;
+            }
+            .collapsible-header::after { content: '' !important; } /* Hide arrow */
+
+            /* Print specific table styles */
+            .marks-table-wrapper, .attendance-grid-container {
+                overflow-x: visible !important; /* Ensure full table prints */
+                border: none;
+                box-shadow: none;
+            }
+            .marks-table, .attendance-grid-header, .attendance-grid-row {
+                width: 100% !important;
+                min-width: unset !important;
+                border-collapse: collapse;
+            }
+            .marks-table th, .marks-table td,
+            .attendance-grid-header > div, .attendance-grid-student-name, .attendance-grid-cell {
+                border: 1px solid #ccc;
+                padding: 4px;
+                font-size: 9px;
+                white-space: normal;
+            }
+            .marks-table th, .attendance-grid-header {
+                background-color: #f0f0f0;
+                color: #333;
+                position: static;
+            }
+            .marks-cell input {
+                border: none;
+                width: auto;
+                padding: 0;
+                text-align: center;
+                font-size: 9px;
+            }
+            .student-name-col, .student-roll-col {
+                min-width: unset;
+            }
+            #schoolLogo {
+                display: block !important;
+                margin: 10px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>حاضری اور نمبرات کا رجسٹر</h1>
+
+        <div class="logo-upload-section">
+            <img id="schoolLogo" src="" alt="سکول کا لوگو" style="display: none;">
+            <input type="file" id="logoInput" accept="image/*">
+            <label for="logoInput">لوگو اپ لوڈ کریں</label>
+            <button id="removeLogoBtn" style="display: none;">لوگو ہٹائیں</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="registerDetails">رجسٹر</button>
+            <button class="tab-button" data-tab="attendance">حاضری</button>
+            <button class="tab-button" data-tab="marks">نمبرات</button>
+            <button class="tab-button" data-tab="summary">خلاصہ</button>
+            <button class="tab-button" data-tab="settings">ترتیبات</button>
+        </div>
+
+        <!-- Register Details Tab Content -->
+        <div id="registerDetailsTabContent" class="tab-content active">
+            <div class="collapsible-header active" data-collapsible="headerInfo">رجسٹر کی معلومات</div>
+            <div class="collapsible-content show" id="headerInfoCollapsible">
+                <div class="header-info">
+                    <div>
+                        <label for="schoolName">سکول کا نام:</label>
+                        <input type="text" id="schoolName" value="گورنمنٹ ہائی سکول">
+                    </div>
+                    <div>
+                        <label for="className">کلاس:</label>
+                        <input type="text" id="className" value="دہم">
+                    </div>
+                    <div>
+                        <label for="sectionName">سیکشن:</label>
+                        <input type="text" id="sectionName" value="الف">
+                    </div>
+                    <div>
+                        <label for="teacherName">استاد کا نام:</label>
+                        <input type="text" id="teacherName" value="محمد علی">
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-header active" data-collapsible="monthlyControls">ماہانہ رجسٹر کنٹرولز</div>
+            <div class="collapsible-content show" id="monthlyControlsCollapsible">
+                <div class="monthly-controls">
+                    <div>
+                        <label for="monthYearSelector">مہینہ/سال منتخب کریں:</label>
+                        <select id="monthYearSelector"></select>
+                    </div>
+                    <div class="button-group">
+                        <button id="newMonthBtn" class="success">نیا مہینہ شامل کریں</button>
+                        <button id="deleteMonthBtn" class="danger">موجودہ مہینہ حذف کریں</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-header active" data-collapsible="registerManagement">رجسٹر مینجمنٹ</div>
+            <div class="collapsible-content show" id="registerManagementCollapsible">
+                <div class="register-controls">
+                    <div>
+                        <label for="registerSelector">رجسٹر منتخب کریں:</label>
+                        <select id="registerSelector"></select>
+                    </div>
+                    <div class="button-group">
+                        <button id="newRegisterBtn" class="success">نیا رجسٹر بنائیں</button>
+                        <button id="deleteRegisterBtn" class="danger">رجسٹر حذف کریں</button>
+                        <button id="saveRegisterBtn" class="primary">رجسٹر محفوظ کریں</button>
+                    </div>
+                    <div class="button-group">
+                        <button id="printRegisterBtn" class="info">پرنٹ/PDF</button>
+                        <button id="resetRegisterBtn" class="warning">رجسٹر ری سیٹ کریں</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-header active" data-collapsible="undoRedo">واپس کریں / دوبارہ کریں</div>
+            <div class="collapsible-content show" id="undoRedoCollapsible">
+                <div class="undo-redo-buttons">
+                    <button id="undoBtn" disabled>واپس کریں (Undo)</button>
+                    <button id="redoBtn" disabled>دوبارہ کریں (Redo)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Tab Content -->
+        <div id="attendanceTabContent" class="tab-content">
+            <div class="collapsible-header active" data-collapsible="attendanceGrid">حاضری کا گرڈ</div>
+            <div class="collapsible-content show" id="attendanceGridCollapsible">
+                <div class="attendance-grid-container">
+                    <div class="attendance-grid-header" id="attendanceGridHeader">
+                        <div>طالب علم کا نام</div>
+                        <!-- Dates will be dynamically added here -->
+                    </div>
+                    <div class="attendance-grid-body" id="attendanceGridBody">
+                        <!-- Student rows with attendance cells will be dynamically added here -->
+                    </div>
+                    <div class="attendance-grid-add-student-row">
+                        <div><input type="text" id="newStudentRollAttendance" placeholder="رول نمبر"></div>
+                        <div><input type="text" id="newStudentNameAttendance" placeholder="طالب علم کا نام"></div>
+                        <!-- Empty cells for dates will be dynamically added here -->
+                        <div><button id="addStudentBtnAttendance">طالب علم شامل کریں</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marks Tab Content -->
+        <div id="marksTabContent" class="tab-content">
+            <div class="collapsible-header active" data-collapsible="marksTable">نمبرات کی تفصیل</div>
+            <div class="collapsible-content show" id="marksTableCollapsible">
+                <div class="marks-table-wrapper">
+                    <table class="marks-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">نمبر شمار</th>
+                                <th rowspan="2" class="student-roll-col">رول نمبر</th>
+                                <th rowspan="2" class="student-name-col">طالب علم کا نام</th>
+                                <th colspan="4" id="marksHeaderSpanMarksTable">نمبرات (مضامین)</th>
+                                <th rowspan="2" class="total-col">کل نمبرات</th>
+                                <th rowspan="2" class="total-col">نمبرات فیصد (%)</th>
+                                <th rowspan="2">کارروائی</th>
+                            </tr>
+                            <tr id="dynamicMarksHeaders">
+                                <!-- Dynamic subject headers will be inserted here by JS -->
+                            </tr>
+                        </thead>
+                        <tbody id="marksTableBody">
+                            <!-- Student rows with marks inputs will be dynamically added here -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="grand-total-row">
+                                <td colspan="3">کل نمبرات</td>
+                                <td colspan="4" id="totalMarksSubjectsFooterMarksTable"></td>
+                                <td class="total-col" id="grandTotalMarksMarksTable"></td>
+                                <td class="total-col" id="grandPercentageMarksMarksTable"></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Tab Content -->
+        <div id="summaryTabContent" class="tab-content">
+            <div class="collapsible-header active" data-collapsible="summarySection">رجسٹر کا خلاصہ</div>
+            <div class="collapsible-content show" id="summarySectionCollapsible">
+                <div class="summary-section">
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <label>کل طلباء:</label>
+                            <span id="totalStudentsSummary">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>کل حاضری کے دن:</label>
+                            <span id="totalAttendanceDaysSummary">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>کل مضامین کے نمبرات:</label>
+                            <span id="totalMarksSubjectsSummary">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>اوسط حاضری فیصد:</label>
+                            <span id="averageAttendancePercentageSummary">0%</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>اوسط نمبرات فیصد:</label>
+                            <span id="averageMarksPercentageSummary">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab Content -->
+        <div id="settingsTabContent" class="tab-content">
+            <div class="collapsible-header active" data-collapsible="attendanceSymbolSettings">حاضری کے نشانات کی ترتیبات</div>
+            <div class="collapsible-content show" id="attendanceSymbolSettingsCollapsible">
+                <div class="attendance-symbol-selector-section">
+                    <div>
+                        <label for="attendanceSymbolsSelector">حاضری کے نشانات منتخب کریں:</label>
+                        <select id="attendanceSymbolsSelector"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible-header active" data-collapsible="dynamicColumnSettings">کالم کی ترتیبات</div>
+            <div class="collapsible-content show" id="dynamicColumnSettingsCollapsible">
+                <div class="dynamic-header-controls">
+                    <div class="control-row">
+                        <div>
+                            <label for="newAttendanceDate">نئی حاضری کی تاریخ:</label>
+                            <input type="number" id="newAttendanceDate" placeholder="تاریخ (مثلاً 1)">
+                        </div>
+                        <button id="addAttendanceColBtn" class="success">حاضری کالم شامل کریں</button>
+                        <button id="removeLastAttendanceColBtn" class="danger">آخری حاضری کالم ہٹائیں</button>
+                    </div>
+                    <div class="control-row">
+                        <div>
+                            <label for="newSubjectName">نئے مضمون کا نام:</label>
+                            <input type="text" id="newSubjectName" placeholder="مضمون (مثلاً کیمسٹری)">
+                        </div>
+                        <button id="addSubjectColBtn" class="success">مضمون کالم شامل کریں</button>
+                        <button id="removeLastSubjectColBtn" class="danger">آخری مضمون کالم ہٹائیں</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="message-area" id="messageArea"></div>
+    </div>
+
+    <script>
+        // IndexedDB Setup
+        const DB_NAME = 'AttendanceMarksDB';
+        const DB_VERSION = 5; // Increment version for auto-save and default data population
+        const STORE_REGISTERS = 'registers';
+        const STORE_METADATA = 'metadata';
+
+        let db;
+        let currentRegisterId = 'default'; // Default register ID
+        let currentMonthId = ''; // Current active month ID
+
+        let history = [];
+        let historyIndex = -1;
+        const MAX_HISTORY = 20; // Limit history states
+
+        // Define different sets of attendance symbols
+        const ATTENDANCE_SYMBOL_SETS = {
+            slash_x: { symbols: ['/', 'X', 'L', 'A'], classes: { '/': 'present', 'X': 'absent', 'L': 'leave', 'A': 'absent' } },
+            tick_cross: { symbols: ['✓', '✗', 'L', 'A'], classes: { '✓': 'present', '✗': 'absent', 'L': 'leave', 'A': 'absent' } },
+            ap: { symbols: ['P', 'A', 'L', 'T'], classes: { 'P': 'present', 'A': 'absent', 'L': 'leave', 'T': 'tardy' } },
+            up_down_arrow: { symbols: ['↑', '↓', 'L', 'A'], classes: { '↑': 'present', '↓': 'absent', 'L': 'leave', 'A': 'absent' } }
+        };
+        let currentAttendanceSymbols = ATTENDANCE_SYMBOL_SETS.slash_x.symbols;
+        let currentAttendanceClasses = ATTENDANCE_SYMBOL_SETS.slash_x.classes;
+
+        const elements = {
+            // Header Info
+            schoolName: document.getElementById('schoolName'),
+            className: document.getElementById('className'),
+            sectionName: document.getElementById('sectionName'),
+            teacherName: document.getElementById('teacherName'),
+
+            // Monthly Controls
+            monthYearSelector: document.getElementById('monthYearSelector'),
+            newMonthBtn: document.getElementById('newMonthBtn'),
+            deleteMonthBtn: document.getElementById('deleteMonthBtn'),
+
+            // Register Controls
+            registerSelector: document.getElementById('registerSelector'),
+            newRegisterBtn: document.getElementById('newRegisterBtn'),
+            deleteRegisterBtn: document.getElementById('deleteRegisterBtn'),
+            saveRegisterBtn: document.getElementById('saveRegisterBtn'),
+            printRegisterBtn: document.getElementById('printRegisterBtn'),
+            resetRegisterBtn: document.getElementById('resetRegisterBtn'),
+
+            // Attendance Symbol Selector
+            attendanceSymbolsSelector: document.getElementById('attendanceSymbolsSelector'),
+
+            // Dynamic Column Controls
+            newAttendanceDate: document.getElementById('newAttendanceDate'),
+            addAttendanceColBtn: document.getElementById('addAttendanceColBtn'),
+            removeLastAttendanceColBtn: document.getElementById('removeLastAttendanceColBtn'),
+            newSubjectName: document.getElementById('newSubjectName'),
+            addSubjectColBtn: document.getElementById('addSubjectColBtn'),
+            removeLastSubjectColBtn: document.getElementById('removeLastSubjectColBtn'),
+
+            // Undo/Redo
+            undoBtn: document.getElementById('undoBtn'),
+            redoBtn: document.getElementById('redoBtn'),
+
+            // Logo
+            schoolLogo: document.getElementById('schoolLogo'),
+            logoInput: document.getElementById('logoInput'),
+            removeLogoBtn: document.getElementById('removeLogoBtn'),
+
+            // Message Area
+            messageArea: document.getElementById('messageArea'),
+
+            // Tabs
+            tabButtons: document.querySelectorAll('.tab-button'),
+            tabContents: document.querySelectorAll('.tab-content'),
+
+            // Collapsibles
+            collapsibleHeaders: document.querySelectorAll('.collapsible-header'),
+
+            // Attendance Grid
+            attendanceGridHeader: document.getElementById('attendanceGridHeader'),
+            attendanceGridBody: document.getElementById('attendanceGridBody'),
+            newStudentRollAttendance: null, // Dynamically assigned
+            newStudentNameAttendance: null, // Dynamically assigned
+            addStudentBtnAttendance: null, // Dynamically assigned
+
+            // Marks Table
+            marksTable: document.querySelector('.marks-table'),
+            marksHeaderSpanMarksTable: document.getElementById('marksHeaderSpanMarksTable'),
+            dynamicMarksHeaders: document.getElementById('dynamicMarksHeaders'),
+            marksTableBody: document.getElementById('marksTableBody'),
+            grandTotalMarksMarksTable: document.getElementById('grandTotalMarksMarksTable'),
+            totalMarksSubjectsFooterMarksTable: document.getElementById('totalMarksSubjectsFooterMarksTable'),
+            grandPercentageMarksMarksTable: document.getElementById('grandPercentageMarksMarksTable'),
+            newStudentRollMarks: null, // Dynamically assigned
+            newStudentNameMarks: null, // Dynamically assigned
+            addStudentBtnMarks: null, // Dynamically assigned
+
+            // Summary Section
+            totalStudentsSummary: document.getElementById('totalStudentsSummary'),
+            totalAttendanceDaysSummary: document.getElementById('totalAttendanceDaysSummary'),
+            totalMarksSubjectsSummary: document.getElementById('totalMarksSubjectsSummary'),
+            averageAttendancePercentageSummary: document.getElementById('averageAttendancePercentageSummary'),
+            averageMarksPercentageSummary: document.getElementById('averageMarksPercentageSummary'),
+        };
+
+        // Utility Functions
+        function showMessage(message, type = 'success') {
+            elements.messageArea.textContent = message;
+            elements.messageArea.className = `message-area ${type}`;
+            elements.messageArea.style.display = 'block';
+            setTimeout(() => {
+                elements.messageArea.style.display = 'none';
+            }, 5000);
+        }
+
+        function generateUniqueId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+        }
+
+        // IndexedDB Operations
+        async function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_REGISTERS)) {
+                        db.createObjectStore(STORE_REGISTERS, { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains(STORE_METADATA)) {
+                        db.createObjectStore(STORE_METADATA, { keyPath: 'key' });
+                    }
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    resolve(db);
+                };
+
+                request.onerror = (event) => {
+                    console.error('IndexedDB error:', event.target.errorCode);
+                    showMessage('ڈیٹا بیس کھولنے میں خرابی: ' + event.target.errorCode, 'error');
+                    reject(event.target.errorCode);
+                };
+            });
+        }
+
+        async function saveRecord(storeName, data) {
+            try {
+                const tx = db.transaction(storeName, 'readwrite');
+                const store = tx.objectStore(storeName);
+                await store.put(data);
+                await tx.complete;
+                return true;
+            } catch (error) {
+                console.error(`Error saving to ${storeName}:`, error);
+                showMessage(`ڈیٹا محفوظ کرنے میں خرابی: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function getRecord(storeName, id) {
+            try {
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                const record = await store.get(id);
+                await tx.complete;
+                return record;
+            } catch (error) {
+                console.error(`Error loading from ${storeName}:`, error);
+                showMessage(`ڈیٹا لوڈ کرنے میں خرابی: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        async function getAllRecords(storeName) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                const request = store.getAll();
+
+                request.onsuccess = () => {
+                    resolve(request.result);
+                };
+
+                request.onerror = (event) => {
+                    console.error(`Error getting all from ${storeName}:`, event.target.errorCode);
+                    showMessage(`تمام ریکارڈز لوڈ کرنے میں خرابی: ${event.target.errorCode}`, 'error');
+                    resolve([]); // Resolve with an empty array on error to prevent .forEach() error
+                };
+
+                tx.onerror = (event) => {
+                    console.error(`Transaction error for ${storeName}:`, event.target.errorCode);
+                    showMessage(`ٹرانزیکشن میں خرابی: ${event.target.errorCode}`, 'error');
+                    resolve([]); // Ensure resolution even if transaction fails
+                };
+            });
+        }
+
+        async function deleteRecord(storeName, id) {
+            try {
+                const tx = db.transaction(storeName, 'readwrite');
+                const store = tx.objectStore(storeName);
+                await store.delete(id);
+                await tx.complete;
+                return true;
+            } catch (error) {
+                console.error(`Error deleting from ${storeName}:`, error);
+                showMessage(`ریکارڈ حذف کرنے میں خرابی: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function saveMetadata(key, value) {
+            return saveRecord(STORE_METADATA, { key, value });
+        }
+
+        async function getMetadata(key) {
+            const data = await getRecord(STORE_METADATA, key);
+            return data ? data.value : null;
+        }
+
+        // State Management (Undo/Redo)
+        function captureState() {
+            const currentState = {
+                headerInfo: {
+                    schoolName: elements.schoolName.value,
+                    className: elements.className.value,
+                    sectionName: elements.sectionName.value,
+                    teacherName: elements.teacherName.value,
+                },
+                attendanceDates: Array.from(elements.attendanceGridHeader.querySelectorAll('.date-header')).map(div => div.textContent),
+                subjectNames: Array.from(elements.dynamicMarksHeaders.querySelectorAll('.subject-name-header')).map(th => th.textContent),
+                students: [],
+                logo: elements.schoolLogo.src,
+                attendanceSymbolSet: elements.attendanceSymbolsSelector.value
+            };
+
+            elements.marksTableBody.querySelectorAll('tr[data-id]').forEach(row => {
+                const studentId = row.dataset.id;
+                const attendanceRow = elements.attendanceGridBody.querySelector(`[data-id="${studentId}"]`);
+
+                students.push({
+                    id: studentId,
+                    roll: row.querySelector('.student-roll-col input').value,
+                    name: row.querySelector('.student-name-col input').value,
+                    attendance: attendanceRow ? Array.from(attendanceRow.querySelectorAll('.attendance-grid-cell')).map(div => div.textContent) : [],
+                    marks: Array.from(row.querySelectorAll('.marks-cell input')).map(input => input.value)
+                });
+            });
+
+            // Clear future history if a new state is added after undo
+            if (historyIndex < history.length - 1) {
+                history = history.slice(0, historyIndex + 1);
+            }
+
+            history.push(currentState);
+            if (history.length > MAX_HISTORY) {
+                history.shift(); // Remove oldest state
+            } else {
+                historyIndex++;
+            }
+            updateUndoRedoButtons();
+        }
+
+        // Auto-save to IndexedDB after state changes
+        async function autoSaveData() {
+            captureState(); // Ensure history is updated before saving to DB
+            await saveCurrentRegisterData();
+        }
+
+        function applyState(state) {
+            if (!state) return;
+
+            elements.schoolName.value = state.headerInfo?.schoolName || '';
+            elements.className.value = state.headerInfo?.className || '';
+            elements.sectionName.value = state.headerInfo?.sectionName || '';
+            elements.teacherName.value = state.headerInfo?.teacherName || '';
+
+            // Apply attendance symbol set
+            elements.attendanceSymbolsSelector.value = state.attendanceSymbolSet || 'slash_x';
+            updateAttendanceSymbols(false); // Apply the loaded symbol set, don't trigger auto-save again
+
+            renderAttendanceGridHeaders(state.attendanceDates || []);
+            renderMarksTableHeaders(state.subjectNames || []);
+
+            elements.attendanceGridBody.innerHTML = ''; // Clear existing attendance rows
+            elements.marksTableBody.innerHTML = ''; // Clear existing marks rows
+
+            (state.students || []).forEach(student => {
+                addStudentRowToTables(student, false); // Don't capture state again during apply
+            });
+            addAddStudentRowToTables(); // Re-add the add student row
+            updateRowNumbers();
+            calculateTotals();
+
+            if (state.logo) {
+                elements.schoolLogo.src = state.logo;
+                elements.schoolLogo.style.display = 'block';
+                elements.removeLogoBtn.style.display = 'inline-block';
+            } else {
+                elements.schoolLogo.src = '';
+                elements.schoolLogo.style.display = 'none';
+                elements.removeLogoBtn.style.display = 'none';
+            }
+        }
+
+        function undo() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                applyState(history[historyIndex]);
+                updateUndoRedoButtons();
+                showMessage('تبدیلی واپس کر دی گئی (Undo)', 'info');
+                autoSaveData(); // Auto-save after undo
+            }
+        }
+
+        function redo() {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                applyState(history[historyIndex]);
+                updateUndoRedoButtons();
+                showMessage('تبدیلی دوبارہ کی گئی (Redo)', 'info');
+                autoSaveData(); // Auto-save after redo
+            }
+        }
+
+        function updateUndoRedoButtons() {
+            elements.undoBtn.disabled = historyIndex <= 0;
+            elements.redoBtn.disabled = historyIndex >= history.length - 1;
+        }
+
+        // UI Rendering and Calculations
+        function renderAttendanceGridHeaders(attendanceDates) {
+            elements.attendanceGridHeader.innerHTML = '<div>طالب علم کا نام</div>'; // Reset header
+            attendanceDates.forEach(date => {
+                const div = document.createElement('div');
+                div.textContent = date;
+                div.classList.add('date-header');
+                elements.attendanceGridHeader.appendChild(div);
+            });
+            // Adjust grid-template-columns for the header
+            elements.attendanceGridHeader.style.gridTemplateColumns = `180px repeat(${attendanceDates.length}, minmax(40px, 1fr))`;
+        }
+
+        function renderMarksTableHeaders(subjectNames) {
+            elements.dynamicMarksHeaders.innerHTML = ''; // Reset header
+            subjectNames.forEach(subject => {
+                const th = document.createElement('th');
+                th.textContent = subject;
+                th.classList.add('subject-name-header');
+                elements.dynamicMarksHeaders.appendChild(th);
+            });
+            elements.marksHeaderSpanMarksTable.colSpan = subjectNames.length;
+            elements.totalMarksSubjectsFooterMarksTable.colSpan = subjectNames.length;
+        }
+
+        function createStudentAttendanceRow(student, attendanceDatesCount) {
+            const row = document.createElement('div');
+            row.classList.add('attendance-grid-row');
+            row.dataset.id = student.id;
+
+            const nameDiv = document.createElement('div');
+            nameDiv.classList.add('attendance-grid-student-name');
+            nameDiv.textContent = student.name;
+            row.appendChild(nameDiv);
+
+            for (let i = 0; i < attendanceDatesCount; i++) {
+                const symbol = student.attendance[i] || '';
+                const symbolClass = currentAttendanceClasses[symbol] || '';
+                const cell = document.createElement('div');
+                cell.classList.add('attendance-grid-cell', symbolClass);
+                cell.textContent = symbol;
+                cell.addEventListener('click', (event) => {
+                    const currentSymbol = event.target.textContent;
+                    const currentIndex = currentAttendanceSymbols.indexOf(currentSymbol);
+                    const nextIndex = (currentIndex + 1) % currentAttendanceSymbols.length;
+                    const newSymbol = currentAttendanceSymbols[nextIndex];
+
+                    event.target.textContent = newSymbol;
+                    event.target.className = 'attendance-grid-cell ' + (currentAttendanceClasses[newSymbol] || '');
+                    calculateTotals();
+                    autoSaveData(); // Auto-save on attendance change
+                });
+                row.appendChild(cell);
+            }
+            row.style.gridTemplateColumns = `180px repeat(${attendanceDatesCount}, minmax(40px, 1fr))`;
+            return row;
+        }
+
+        function createStudentMarksRow(student, subjectNamesCount) {
+            const row = document.createElement('tr');
+            row.dataset.id = student.id;
+
+            let rowHtml = `
+                <td></td>
+                <td class="student-roll-col"><input type="text" value="${student.roll || ''}" data-student-id="${student.id}" data-field="roll"></td>
+                <td class="student-name-col"><input type="text" value="${student.name || ''}" data-student-id="${student.id}" data-field="name"></td>
+            `;
+
+            for (let i = 0; i < subjectNamesCount; i++) {
+                rowHtml += `<td class="marks-cell"><input type="text" value="${student.marks[i] || ''}" data-student-id="${student.id}" data-subject-index="${i}"></td>`;
+            }
+
+            rowHtml += `
+                <td class="total-col marks-total"></td>
+                <td class="total-col marks-percentage"></td>
+                <td><button class="delete-student-btn" data-student-id="${student.id}">حذف کریں</button></td>
+            `;
+            row.innerHTML = rowHtml;
+
+            // Add event listeners for marks inputs
+            row.querySelectorAll('.marks-cell input').forEach(input => {
+                input.addEventListener('input', () => { // Use 'input' for immediate feedback
+                    calculateTotals();
+                });
+                input.addEventListener('change', (e) => { // Use 'change' for final value and auto-save
+                    const val = parseInt(e.target.value);
+                    if (isNaN(val) || val < 0 || val > 100) { // Assuming marks are 0-100
+                        showMessage('نمبرات 0 سے 100 کے درمیان ہونے چاہئیں', 'warning');
+                        e.target.value = ''; // Clear invalid input
+                        calculateTotals(); // Recalculate if input was cleared
+                    }
+                    autoSaveData(); // Auto-save on marks change
+                });
+            });
+
+            // Add event listeners for student info inputs (roll/name)
+            row.querySelectorAll('.student-roll-col input, .student-name-col input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    // Update name in attendance grid if name changes
+                    if (e.target.dataset.field === 'name') {
+                        const studentId = e.target.dataset.studentId;
+                        const attendanceNameDiv = elements.attendanceGridBody.querySelector(`[data-id="${studentId}"] .attendance-grid-student-name`);
+                        if (attendanceNameDiv) {
+                            attendanceNameDiv.textContent = e.target.value;
+                        }
+                    }
+                });
+                input.addEventListener('change', autoSaveData); // Auto-save on roll/name change
+            });
+
+            row.querySelector('.delete-student-btn').addEventListener('click', (e) => {
+                deleteStudent(e.target.dataset.studentId);
+                autoSaveData(); // Auto-save after student deletion
+            });
+            return row;
+        }
+
+        function addStudentRowToTables(studentData, shouldCaptureState = true) {
+            const attendanceDatesCount = Array.from(elements.attendanceGridHeader.querySelectorAll('.date-header')).length;
+            const subjectNamesCount = Array.from(elements.dynamicMarksHeaders.querySelectorAll('.subject-name-header')).length;
+
+            const attendanceRow = createStudentAttendanceRow(studentData, attendanceDatesCount);
+            elements.attendanceGridBody.appendChild(attendanceRow);
+
+            const marksRow = createStudentMarksRow(studentData, subjectNamesCount);
+            elements.marksTableBody.insertBefore(marksRow, elements.marksTableBody.querySelector('.add-student-row'));
+
+            if (shouldCaptureState) {
+                captureState();
+            }
+        }
+
+        function addAddStudentRowToTables() {
+            // Remove existing add student rows if any
+            const existingMarksAddRow = elements.marksTableBody.querySelector('.add-student-row');
+            if (existingMarksAddRow) {
+                existingMarksAddRow.remove();
+            }
+            const existingAttendanceAddRow = elements.attendanceGridBody.querySelector('.attendance-grid-add-student-row');
+            if (existingAttendanceAddRow) {
+                existingAttendanceAddRow.remove();
+            }
+
+            // Add row to Marks Table
+            const marksAddRow = document.createElement('tr');
+            marksAddRow.className = 'add-student-row';
+            const totalMarksCols = Array.from(elements.dynamicMarksHeaders.children).length;
+            marksAddRow.innerHTML = `
+                <td></td>
+                <td><input type="text" id="newStudentRollMarks" placeholder="رول نمبر"></td>
+                <td><input type="text" id="newStudentNameMarks" placeholder="طالب علم کا نام"></td>
+                <td colspan="${totalMarksCols + 2}"></td> <!-- +2 for total columns -->
+                <td><button id="addStudentBtnMarks">طالب علم شامل کریں</button></td>
+            `;
+            elements.marksTableBody.appendChild(marksAddRow);
+
+            // Add row to Attendance Grid
+            const attendanceAddRow = document.createElement('div');
+            attendanceAddRow.classList.add('attendance-grid-add-student-row');
+            const attendanceDatesCount = Array.from(elements.attendanceGridHeader.querySelectorAll('.date-header')).length;
+            attendanceAddRow.style.gridTemplateColumns = `180px repeat(${attendanceDatesCount}, minmax(40px, 1fr))`;
+            attendanceAddRow.innerHTML = `
+                <div><input type="text" id="newStudentRollAttendance" placeholder="رول نمبر"></div>
+                <div><input type="text" id="newStudentNameAttendance" placeholder="طالب علم کا نام"></div>
+                ${Array(attendanceDatesCount).fill('<div></div>').join('')} <!-- Empty cells for dates -->
+                <div><button id="addStudentBtnAttendance">طالب علم شامل کریں</button></div>
+            `;
+            elements.attendanceGridBody.appendChild(attendanceAddRow);
+
+
+            // Re-attach event listeners for the new add student rows
+            elements.newStudentRollMarks = marksAddRow.querySelector('#newStudentRollMarks');
+            elements.newStudentNameMarks = marksAddRow.querySelector('#newStudentNameMarks');
+            elements.addStudentBtnMarks = marksAddRow.querySelector('#addStudentBtnMarks');
+
+            elements.newStudentRollAttendance = attendanceAddRow.querySelector('#newStudentRollAttendance');
+            elements.newStudentNameAttendance = attendanceAddRow.querySelector('#newStudentNameAttendance');
+            elements.addStudentBtnAttendance = attendanceAddRow.querySelector('#addStudentBtnAttendance');
+
+            // Sync inputs between the two add rows
+            elements.newStudentRollMarks.addEventListener('input', (e) => elements.newStudentRollAttendance.value = e.target.value);
+            elements.newStudentNameMarks.addEventListener('input', (e) => elements.newStudentNameAttendance.value = e.target.value);
+            elements.newStudentRollAttendance.addEventListener('input', (e) => elements.newStudentRollMarks.value = e.target.value);
+            elements.newStudentNameAttendance.addEventListener('input', (e) => elements.newStudentNameMarks.value = e.target.value);
+
+            // Add student button listener (either can trigger)
+            elements.addStudentBtnMarks.addEventListener('click', addNewStudent);
+            elements.addStudentBtnAttendance.addEventListener('click', addNewStudent);
+
+            // Keyboard navigation for add student row
+            elements.newStudentRollMarks.addEventListener('keydown', handleAddStudentEnter);
+            elements.newStudentNameMarks.addEventListener('keydown', handleAddStudentEnter);
+            elements.newStudentRollAttendance.addEventListener('keydown', handleAddStudentEnter);
+            elements.newStudentNameAttendance.addEventListener('keydown', handleAddStudentEnter);
+        }
+
+        function updateRowNumbers() {
+            elements.marksTableBody.querySelectorAll('tr[data-id]').forEach((row, index) => {
+                row.querySelector('td:first-child').textContent = index + 1;
+            });
+        }
+
+        function calculateTotals() {
+            let totalStudents = 0;
+            let grandTotalAttendance = 0;
+            let grandTotalMarks = 0;
+            let totalPossibleAttendance = 0;
+            let totalPossibleMarks = 0;
+
+            const attendanceCols = Array.from(elements.attendanceGridHeader.querySelectorAll('.date-header')).length;
+            const marksCols = Array.from(elements.dynamicMarksHeaders.querySelectorAll('.subject-name-header')).length;
+            const maxMarksPerSubject = 100; // Assuming max marks for each subject is 100
+
+            elements.marksTableBody.querySelectorAll('tr[data-id]').forEach(row => {
+                totalStudents++;
+                let studentAttendance = 0;
+                let studentMarks = 0;
+                const studentId = row.dataset.id;
+                const attendanceRow = elements.attendanceGridBody.querySelector(`[data-id="${studentId}"]`);
+
+                // Calculate attendance
+                if (attendanceRow) {
+                    const attendanceCells = attendanceRow.querySelectorAll('.attendance-grid-cell');
+                    attendanceCells.forEach(cell => {
+                        if (cell.textContent === currentAttendanceSymbols[0]) { // Check against the 'present' symbol
+                            studentAttendance++;
+                        }
+                    });
+                }
+                // Note: Attendance totals are not displayed per student in the marks table, only overall summary
+                totalPossibleAttendance += attendanceCols; // Each student has 'attendanceCols' possible attendance days
+
+                // Calculate marks
+                const marksInputs = row.querySelectorAll('.marks-cell input');
+                marksInputs.forEach(input => {
+                    const mark = parseInt(input.value);
+                    if (!isNaN(mark) && mark >= 0 && mark <= 100) { // Validate marks
+                        studentMarks += mark;
+                    }
+                });
+                row.querySelector('.marks-total').textContent = studentMarks;
+                totalPossibleMarks += (marksCols * maxMarksPerSubject); // Each student has 'marksCols' subjects, each max 100
+
+                const marksPercentage = (marksCols * maxMarksPerSubject) > 0 ? ((studentMarks / (marksCols * maxMarksPerSubject)) * 100).toFixed(2) : 0;
+                row.querySelector('.marks-percentage').textContent = `${marksPercentage}%`;
+
+                grandTotalAttendance += studentAttendance;
+                grandTotalMarks += studentMarks;
+            });
+
+            // Update Grand Totals in TFOOT for Marks Table
+            elements.grandTotalMarksMarksTable.textContent = grandTotalMarks;
+            const overallMarksPercentage = totalPossibleMarks > 0 ? ((grandTotalMarks / totalPossibleMarks) * 100).toFixed(2) : 0;
+            elements.grandPercentageMarksMarksTable.textContent = `${overallMarksPercentage}%`;
+
+            // Update Summary Section
+            elements.totalStudentsSummary.textContent = totalStudents;
+            elements.totalAttendanceDaysSummary.textContent = attendanceCols;
+            elements.totalMarksSubjectsSummary.textContent = marksCols;
+            const overallAttendancePercentage = totalPossibleAttendance > 0 ? ((grandTotalAttendance / totalPossibleAttendance) * 100).toFixed(2) : 0;
+            elements.averageAttendancePercentageSummary.textContent = `${overallAttendancePercentage}%`;
+            elements.averageMarksPercentageSummary.textContent = `${overallMarksPercentage}%`;
+        }
+
+        // Event Handlers
+        async function addNewStudent() {
+            const roll = elements.newStudentRollMarks.value.trim();
+            const name = elements.newStudentNameMarks.value.trim();
+
+            if (!roll || !name) {
+                showMessage('رول نمبر اور نام دونوں درکار ہیں!', 'error');
+                return;
+            }
+
+            const attendanceDatesCount = Array.from(elements.attendanceGridHeader.querySelectorAll('.date-header')).length;
+            const subjectNamesCount = Array.from(elements.dynamicMarksHeaders.querySelectorAll('.subject-name-header')).length;
+
+            const newStudent = {
+                id: generateUniqueId(),
+                roll: roll,
+                name: name,
+                attendance: Array(attendanceDatesCount).fill(''), // Initialize with empty attendance
+                marks: Array(subjectNamesCount).fill('') // Initialize with empty marks
+            };
+
+            addStudentRowToTables(newStudent); // This calls captureState internally
+            updateRowNumbers();
+            calculateTotals();
+
+            elements.newStudentRollMarks.value = '';
+            elements.newStudentNameMarks.value = '';
+            elements.newStudentRollAttendance.value = '';
+            elements.newStudentNameAttendance.value = '';
+            elements.newStudentRollMarks.focus();
+            showMessage('طالب علم کامیابی سے شامل ہو گیا!', 'success');
+            autoSaveData(); // Auto-save after adding a new student
+        }
+
+        function deleteStudent(id) {
+            const marksRowToDelete = elements.marksTableBody.querySelector(`tr[data-id="${id}"]`);
+            const attendanceRowToDelete = elements.attendanceGridBody.querySelector(`[data-id="${id}"]`);
+
+            if ((marksRowToDelete || attendanceRowToDelete) && confirm('کیا آپ واقعی اس طالب علم کو حذف کرنا چاہتے ہیں؟')) {
+                marksRowToDelete?.remove();
+                attendanceRowToDelete?.remove();
+                updateRowNumbers();
+                calculateTotals();
+                captureState(); // Capture state after deleting student
+                showMessage('طالب علم کامیابی سے حذف ہو گیا!', 'success');
+                autoSaveData(); // Auto-save after student deletion
+            }
+        }
+
+        function handleAddStudentEnter(event) {
+            if (event.key === 'Enter') {
+                if (event.target === elements.newStudentRollMarks || event.target === elements.newStudentRollAttendance) {
+                    elements.newStudentNameMarks.focus();
+                } else if (event.target === elements.newStudentNameMarks || event.target === elements.newStudentNameAttendance) {
+                    addNewStudent();
+                }
+            }
+        }
+
+        async function saveCurrentRegisterData() {
+            const students = [];
+            elements.marksTableBody.querySelectorAll('tr[data-id]').forEach(row => {
+                const studentId = row.dataset.id;
+                const attendanceRow = elements.attendanceGridBody.querySelector(`[data-id="${studentId}"]`);
+
+                students.push({
+                    id: studentId,
+                    roll: row.querySelector('.student-roll-col input').value,
+                    name: row.querySelector('.student-name-col input').value,
+                    attendance: attendanceRow ? Array.from(attendanceRow.querySelectorAll('.attendance-grid-cell')).map(div => div.textContent) : [],
+                    marks: Array.from(row.querySelectorAll('.marks-cell input')).map(input => input.value)
+                });
+            });
+
+            const attendanceDates = Array.from(elements.attendanceGridHeader.querySelectorAll('.date-header')).map(div => div.textContent);
+            const subjectNames = Array.from(elements.dynamicMarksHeaders.querySelectorAll('.subject-name-header')).map(th => th.textContent);
+
+            // Safely get register name and month name
+            const registerName = elements.registerSelector.options[elements.registerSelector.selectedIndex]?.text || 'نامعلوم رجسٹر';
+            const monthName = elements.monthYearSelector.options[elements.monthYearSelector.selectedIndex]?.text || 'نامعلوم مہینہ';
+
+            const registerData = {
+                id: currentRegisterId,
+                name: registerName, // Use the safely retrieved name
+                monthId: currentMonthId,
+                monthName: monthName, // Use the safely retrieved name
+                headerInfo: {
+                    schoolName: elements.schoolName.value,
+                    className: elements.className.value,
+                    sectionName: elements.sectionName.value,
+                    teacherName: elements.teacherName.value,
+                },
+                attendanceDates: attendanceDates,
+                subjectNames: subjectNames,
+                students: students,
+                logo: elements.schoolLogo.src,
+                attendanceSymbolSet: elements.attendanceSymbolsSelector.value
+            };
+            const success = await saveRecord(STORE_REGISTERS, registerData);
+            if (success) {
+                await saveMetadata('lastActiveRegister', currentRegisterId);
+                await saveMetadata('lastActiveMonth', currentMonthId);
+                await saveMetadata('lastAttendanceSymbolSet', elements.attendanceSymbolsSelector.value);
+                showMessage('رجسٹر کامیابی سے محفوظ ہو گیا!', 'success');
+            }
+        }
+
+        async function loadCurrentRegister(id) {
+            const register = await getRecord(STORE_REGISTERS, id);
+            if (register) {
+                elements.schoolName.value = register.headerInfo?.schoolName || '';
+                elements.className.value = register.headerInfo?.className || '';
+                elements.sectionName.value = register.headerInfo?.sectionName || '';
+                elements.teacherName.value = register.headerInfo?.teacherName || '';
+
+                // Set attendance symbol set from loaded register, or default
+                elements.attendanceSymbolsSelector.value = register.attendanceSymbolSet || 'slash_x';
+                updateAttendanceSymbols(false); // Apply the loaded symbol set, don't trigger auto-save again
+
+                renderAttendanceGridHeaders(register.attendanceDates || []);
+                renderMarksTableHeaders(register.subjectNames || []);
+
+                elements.attendanceGridBody.innerHTML = ''; // Clear existing attendance rows
+                elements.marksTableBody.innerHTML = ''; // Clear existing marks rows
+
+                (register.students || []).forEach(student => {
+                    addStudentRowToTables(student, false); // Don't capture state again during load
+                });
+                addAddStudentRowToTables(); // Re-add the add student row
+                updateRowNumbers();
+                calculateTotals();
+
+                if (register.logo) {
+                    elements.schoolLogo.src = register.logo;
+                    elements.schoolLogo.style.display = 'block';
+                    elements.removeLogoBtn.style.display = 'inline-block';
+                } else {
+                    elements.schoolLogo.src = '';
+                    elements.schoolLogo.style.display = 'none';
+                    elements.removeLogoBtn.style.display = 'none';
+                }
+
+                // Reset history for the new register
+                history = [];
+                historyIndex = -1;
+                captureState(); // Capture initial state of the loaded register
+                showMessage(`رجسٹر "${register.name}" لوڈ ہو گیا!`, 'success');
+            } else {
+                showMessage('رجسٹر نہیں ملا یا لوڈ کرنے میں خرابی ہوئی!', 'error');
+                // If default register not found, initialize with sample data
+                if (id === 'default') {
+                    await initializeDefaultRegister();
+                }
+            }
+        }
+
+        async function populateRegisterSelector() {
+            const allRegisters = await getAllRecords(STORE_REGISTERS);
+            const monthlyRegisters = allRegisters.filter(reg => reg.monthId === currentMonthId);
+
+            elements.registerSelector.innerHTML = '';
+            if (monthlyRegisters.length === 0) {
+                const option = document.createElement('option');
+                option.value = 'no-register';
+                option.textContent = 'کوئی رجسٹر نہیں';
+                elements.registerSelector.appendChild(option);
+                elements.registerSelector.disabled = true;
+                // Clear tables if no registers
+                elements.attendanceGridBody.innerHTML = '';
+                elements.marksTableBody.innerHTML = '';
+                addAddStudentRowToTables();
+                calculateTotals();
+                showMessage('اس مہینے کے لیے کوئی رجسٹر نہیں ملا۔ نیا رجسٹر بنائیں!', 'info');
+                return;
+            } else {
+                elements.registerSelector.disabled = false;
+                monthlyRegisters.forEach(reg => {
+                    const option = document.createElement('option');
+                    option.value = reg.id;
+                    option.textContent = reg.name;
+                    elements.registerSelector.appendChild(option);
+                });
+                const lastActive = await getMetadata('lastActiveRegister');
+                if (lastActive && monthlyRegisters.some(reg => reg.id === lastActive && reg.monthId === currentMonthId)) {
+                    currentRegisterId = lastActive;
+                } else {
+                    currentRegisterId = monthlyRegisters[0].id;
+                }
+                await loadCurrentRegister(currentRegisterId);
+            }
+        }
+
+        async function handleNewRegister() {
+            if (!currentMonthId) {
+                showMessage('پہلے ایک مہینہ منتخب کریں یا نیا مہینہ شامل کریں۔', 'error');
+                return;
+            }
+            const registerName = prompt('نئے رجسٹر کا نام درج کریں:');
+            if (registerName && registerName.trim() !== '') {
+                const newId = generateUniqueId();
+                const defaultAttendanceDates = Array.from({ length: 30 }, (_, i) => (i + 1).toString()); // 1 to 30
+                const newRegisterData = {
+                    id: newId,
+                    name: registerName.trim(),
+                    monthId: currentMonthId,
+                    monthName: elements.monthYearSelector.options[elements.monthYearSelector.selectedIndex]?.text || 'نامعلوم مہینہ',
+                    headerInfo: {
+                        schoolName: elements.schoolName.value,
+                        className: elements.className.value,
+                        sectionName: elements.sectionName.value,
+                        teacherName: elements.teacherName.value,
+                    },
+                    attendanceDates: defaultAttendanceDates,
+                    subjectNames: ['اردو', 'انگریزی', 'ریاضی', 'سائنس'], // Default subjects
+                    students: [],
+                    logo: elements.schoolLogo.src || '',
+                    attendanceSymbolSet: elements.attendanceSymbolsSelector.value
+                };
+                const success = await saveRecord(STORE_REGISTERS, newRegisterData);
+                if (success) {
+                    await populateRegisterSelector();
+                    await loadCurrentRegister(newId);
+                    showMessage(`نیا رجسٹر "${registerName}" کامیابی سے بن گیا!`, 'success');
+                }
+            } else {
+                showMessage('رجسٹر کا نام خالی نہیں ہو سکتا۔', 'error');
+            }
+        }
+
+        async function handleDeleteRegister() {
+            if (elements.registerSelector.options.length <= 1 && elements.registerSelector.value !== 'no-register') {
+                showMessage('آپ آخری رجسٹر کو حذف نہیں کر سکتے۔', 'error');
+                return;
+            }
+            if (elements.registerSelector.value === 'no-register') {
+                showMessage('حذف کرنے کے لیے کوئی رجسٹر نہیں ہے۔', 'info');
+                return;
+            }
+
+            const registerName = elements.registerSelector.options[elements.registerSelector.selectedIndex]?.text || 'نامعلوم رجسٹر';
+            if (confirm(`کیا آپ واقعی رجسٹر "${registerName}" کو حذف کرنا چاہتے ہیں؟ یہ کارروائی ناقابل واپسی ہے!`)) {
+                const success = await deleteRecord(STORE_REGISTERS, currentRegisterId);
+                if (success) {
+                    await populateRegisterSelector();
+                    showMessage(`رجسٹر "${registerName}" کامیابی سے حذف ہو گیا!`, 'success');
+                }
+            }
+        }
+
+        function printRegister() {
+            window.print();
+        }
+
+        async function resetRegister() {
+            if (confirm('کیا آپ واقعی موجودہ رجسٹر کا تمام ڈیٹا ری سیٹ کرنا چاہتے ہیں؟ یہ کارروائی ناقابل واپسی ہے!')) {
+                const currentRegisterName = elements.registerSelector.options[elements.registerSelector.selectedIndex]?.text || 'نامعلوم رجسٹر';
+                const defaultAttendanceDates = Array.from({ length: 30 }, (_, i) => (i + 1).toString()); // 1 to 30
+                const defaultRegisterData = {
+                    id: currentRegisterId,
+                    name: currentRegisterName,
+                    monthId: currentMonthId,
+                    monthName: elements.monthYearSelector.options[elements.monthYearSelector.selectedIndex]?.text || 'نامعلوم مہینہ',
+                    headerInfo: {
+                        schoolName: elements.schoolName.value,
+                        className: elements.className.value,
+                        sectionName: elements.sectionName.value,
+                        teacherName: elements.teacherName.value,
+                    },
+                    attendanceDates: defaultAttendanceDates,
+                    subjectNames: ['اردو', 'انگریزی', 'ریاضی', 'سائنس'],
+                    students: [], // Empty students for reset
+                    logo: elements.schoolLogo.src || '',
+                    attendanceSymbolSet: elements.attendanceSymbolsSelector.value
+                };
+                const success = await saveRecord(STORE_REGISTERS, defaultRegisterData);
+                if (success) {
+                    await loadCurrentRegister(currentRegisterId);
+                    showMessage('رجسٹر کامیابی سے ری سیٹ ہو گیا!', 'success');
+                }
+            }
+        }
+
+        async function initializeDefaultRegister() {
+            const defaultMonthId = generateUniqueId();
+            const defaultMonthName = 'جنوری 2024';
+            const defaultAttendanceDates = Array.from({ length: 30 }, (_, i) => (i + 1).toString()); // 1 to 30
+
+            const defaultRegisterData = {
+                id: 'default',
+                name: 'پہلا رجسٹر',
+                monthId: defaultMonthId,
+                monthName: defaultMonthName,
+                headerInfo: {
+                    schoolName: 'گورنمنٹ ہائی سکول',
+                    className: 'دہم',
+                    sectionName: 'الف',
+                    teacherName: 'محمد علی',
+                },
+                attendanceDates: defaultAttendanceDates,
+                subjectNames: ['اردو', 'انگریزی', 'ریاضی', 'سائنس'],
+                students: [
+                    { id: 's1', roll: '101', name: 'احمد علی', attendance: ['/', '/', 'X', '/', '/', '/', 'X', ...Array(23).fill('')], marks: ['85', '78', '92', '88'] },
+                    { id: 's2', roll: '102', name: 'فاطمہ خان', attendance: ['/', '/', '/', '/', '/', '/', '/', ...Array(23).fill('/')], marks: ['90', '85', '95', '91'] },
+                    { id: 's3', roll: '103', name: 'عائشہ محمود', attendance: ['/', 'X', '/', '/', 'X', '/', '/', ...Array(23).fill('')], marks: ['70', '65', '75', '68'] },
+                    { id: 's4', roll: '104', name: 'زینب بتول', attendance: ['/', '/', '/', '/', '/', 'X', '/', ...Array(23).fill('/')], marks: ['80', '72', '88', '79'] }
+                ],
+                logo: '',
+                attendanceSymbolSet: 'slash_x'
+            };
+            await saveRecord(STORE_REGISTERS, defaultRegisterData);
+            await saveMetadata('lastActiveMonth', defaultMonthId);
+            await saveMetadata('lastActiveRegister', 'default');
+            await saveMetadata('lastAttendanceSymbolSet', 'slash_x');
+            await populateMonthSelector(); // This will also load the default month and its registers
+        }
+
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    elements.schoolLogo.src = e.target.result;
+                    elements.schoolLogo.style.display = 'block';
+                    elements.removeLogoBtn.style.display = 'inline-block';
+                    autoSaveData(); // Auto-save after logo change
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeLogo() {
+            if (confirm('کیا آپ واقعی لوگو ہٹانا چاہتے ہیں؟')) {
+                elements.schoolLogo.src = '';
+                elements.schoolLogo.style.display = 'none';
+                elements.removeLogoBtn.style.display = 'none';
+                autoSaveData(); // Auto-save after logo removal
+            }
+        }
+
+        // Monthly Register Management
+        async function populateMonthSelector() {
+            const allRegisters = await getAllRecords(STORE_REGISTERS);
+            const months = {};
+            allRegisters.forEach(reg => {
+                if (reg.monthId) {
+                    months[reg.monthId] = {
+                        id: reg.monthId,
+                        name: reg.monthName || (reg.headerInfo?.monthYear || `مہینہ ${reg.monthId.substring(0, 5)}`)
+                    };
+                }
+            });
+
+            const monthList = Object.values(months).sort((a, b) => a.name.localeCompare(b.name, 'ur', { numeric: true }));
+
+            elements.monthYearSelector.innerHTML = '';
+            if (monthList.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'کوئی مہینہ نہیں';
+                elements.monthYearSelector.appendChild(option);
+                elements.monthYearSelector.disabled = true;
+                currentMonthId = '';
+                showMessage('کوئی مہینہ نہیں ملا۔ نیا مہینہ شامل کریں۔', 'info');
+                // Initialize with default if no months exist
+                await initializeDefaultRegister();
+                return;
+            } else {
+                elements.monthYearSelector.disabled = false;
+                monthList.forEach(month => {
+                    const option = document.createElement('option');
+                    option.value = month.id;
+                    option.textContent = month.name;
+                    elements.monthYearSelector.appendChild(option);
+                });
+
+                const lastActiveMonth = await getMetadata('lastActiveMonth');
+                if (lastActiveMonth && monthList.some(m => m.id === lastActiveMonth)) {
+                    currentMonthId = lastActiveMonth;
+                } else {
+                    currentMonthId = monthList[0].id;
+                }
+                elements.monthYearSelector.value = currentMonthId;
+                await populateRegisterSelector(); // Load registers for the selected month
+            }
+        }
+
+        async function handleNewMonth() {
+            const monthName = prompt('نئے مہینے کا نام (مثلاً فروری 2024) درج کریں:');
+            if (monthName && monthName.trim() !== '') {
+                const newMonthId = generateUniqueId();
+                const defaultAttendanceDates = Array.from({ length: 30 }, (_, i) => (i + 1).toString()); // 1 to 30
+                // Create a default register for the new month
+                const newRegisterId = generateUniqueId();
+                const newRegisterData = {
+                    id: newRegisterId,
+                    name: 'پہلا رجسٹر',
+                    monthId: newMonthId,
+                    monthName: monthName.trim(), // Store month name with the register
+                    headerInfo: {
+                        schoolName: elements.schoolName.value,
+                        className: elements.className.value,
+                        sectionName: elements.sectionName.value,
+                        teacherName: elements.teacherName.value,
+                    },
+                    attendanceDates: defaultAttendanceDates,
+                    subjectNames: ['اردو', 'انگریزی', 'ریاضی', 'سائنس'],
+                    students: [],
+                    logo: elements.schoolLogo.src || '',
+                    attendanceSymbolSet: elements.attendanceSymbolsSelector.value
+                };
+                const success = await saveRecord(STORE_REGISTERS, newRegisterData);
+                if (success) {
+                    await populateMonthSelector();
+                    elements.monthYearSelector.value = newMonthId; // Select the new month
+                    currentMonthId = newMonthId;
+                    await populateRegisterSelector(); // Load registers for the new month (which will be the first register)
+                    showMessage(`نیا مہینہ "${monthName}" کامیابی سے شامل ہو گیا!`, 'success');
+                }
+            } else {
+                showMessage('مہینے کا نام خالی نہیں ہو سکتا۔', 'error');
+            }
+        }
+
+        async function handleDeleteMonth() {
+            if (elements.monthYearSelector.options.length <= 1) {
+                showMessage('آپ آخری مہینے کو حذف نہیں کر سکتے۔', 'error');
+                return;
+            }
+            const monthName = elements.monthYearSelector.options[elements.monthYearSelector.selectedIndex]?.text || 'نامعلوم مہینہ';
+            if (confirm(`کیا آپ واقعی مہینہ "${monthName}" اور اس کے تمام رجسٹرز کو حذف کرنا چاہتے ہیں؟ یہ کارروائی ناقابل واپسی ہے!`)) {
+                const allRegisters = await getAllRecords(STORE_REGISTERS);
+                const registersToDelete = allRegisters.filter(reg => reg.monthId === currentMonthId);
+                let allDeleted = true;
+                for (const reg of registersToDelete) {
+                    const success = await deleteRecord(STORE_REGISTERS, reg.id);
+                    if (!success) allDeleted = false;
+                }
+
+                if (allDeleted) {
+                    await populateMonthSelector(); // This will automatically select the next available month
+                    showMessage(`مہینہ "${monthName}" اور اس کے تمام رجسٹرز کامیابی سے حذف ہو گئے!`, 'success');
+                } else {
+                    showMessage('مہینہ حذف کرنے میں کچھ خرابی پیش آئی۔', 'error');
+                }
+            }
+        }
+
+        // Dynamic Column Management
+        function addAttendanceColumn() {
+            const date = elements.newAttendanceDate.value.trim();
+            if (!date || isNaN(parseInt(date))) {
+                showMessage('حاضری کی تاریخ کے لیے ایک درست نمبر درج کریں۔', 'error');
+                return;
+            }
+
+            const currentDates = Array.from(elements.attendanceGridHeader.querySelectorAll('.date-header')).map(div => div.textContent);
+            if (currentDates.includes(date)) {
+                showMessage('یہ تاریخ پہلے سے موجود ہے۔', 'warning');
+                return;
+            }
+
+            const newDates = [...currentDates, date].sort((a, b) => parseInt(a) - parseInt(b));
+
+            renderAttendanceGridHeaders(newDates);
+
+            // Add new attendance cell to existing student rows
+            elements.attendanceGridBody.querySelectorAll('.attendance-grid-row').forEach(row => {
+                const newCell = document.createElement('div');
+                newCell.classList.add('attendance-grid-cell');
+                newCell.textContent = ''; // Start with empty
+                newCell.addEventListener('click', (event) => {
+                    const currentSymbol = event.target.textContent;
+                    const currentIndex = currentAttendanceSymbols.indexOf(currentSymbol);
+                    const nextIndex = (currentIndex + 1) % currentAttendanceSymbols.length;
+                    const newSymbol = currentAttendanceSymbols[nextIndex];
+
+                    event.target.textContent = newSymbol;
+                    event.target.className = 'attendance-grid-cell ' + (currentAttendanceClasses[newSymbol] || '');
+                    calculateTotals();
+                    autoSaveData(); // Auto-save on attendance change
+                });
+
+                // Find the correct insertion point based on sorted dates
+                let insertBeforeNode = null;
+                const dateIndex = newDates.indexOf(date);
+                // +1 because the first child is the student name div
+                insertBeforeNode = row.children[dateIndex + 1];
+                row.insertBefore(newCell, insertBeforeNode);
+            });
+            addAddStudentRowToTables(); // Update colspan for add student row
+            calculateTotals();
+            autoSaveData(); // Auto-save after column change
+            elements.newAttendanceDate.value = '';
+            showMessage(`تاریخ "${date}" کامیابی سے شامل ہو گئی!`, 'success');
+        }
+
+        function removeLastAttendanceColumn() {
+            const currentDates = Array.from(elements.attendanceGridHeader.querySelectorAll('.date-header'));
+            if (currentDates.length === 0) {
+                showMessage('حذف کرنے کے لیے کوئی حاضری کالم نہیں ہے۔', 'warning');
+                return;
+            }
+
+            if (!confirm('کیا آپ واقعی آخری حاضری کالم حذف کرنا چاہتے ہیں؟')) return;
+
+            const lastDateHeader = currentDates[currentDates.length - 1];
+            lastDateHeader.remove();
+
+            elements.attendanceGridBody.querySelectorAll('.attendance-grid-row').forEach(row => {
+                const attendanceCells = row.querySelectorAll('.attendance-grid-cell');
+                if (attendanceCells.length > 0) {
+                    attendanceCells[attendanceCells.length - 1].remove();
+                }
+            });
+
+            const newDates = Array.from(elements.attendanceGridHeader.querySelectorAll('.date-header')).map(div => div.textContent);
+            renderAttendanceGridHeaders(newDates); // Update grid-template-columns
+            addAddStudentRowToTables(); // Update colspan for add student row
+            calculateTotals();
+            autoSaveData(); // Auto-save after column change
+            showMessage('آخری حاضری کالم کامیابی سے ہٹا دیا گیا!', 'success');
+        }
+
+        function addSubjectColumn() {
+            const subjectName = elements.newSubjectName.value.trim();
+            if (!subjectName) {
+                showMessage('مضمون کا نام درج کریں۔', 'error');
+                return;
+            }
+
+            const currentSubjects = Array.from(elements.dynamicMarksHeaders.querySelectorAll('.subject-name-header')).map(th => th.textContent);
+            if (currentSubjects.includes(subjectName)) {
+                showMessage('یہ مضمون پہلے سے موجود ہے۔', 'warning');
+                return;
+            }
+
+            const newSubjects = [...currentSubjects, subjectName];
+            renderMarksTableHeaders(newSubjects);
+
+            // Add new marks cell to existing student rows
+            elements.marksTableBody.querySelectorAll('tr[data-id]').forEach(row => {
+                const newCell = document.createElement('td');
+                newCell.classList.add('marks-cell');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = '';
+                input.addEventListener('input', () => { calculateTotals(); });
+                input.addEventListener('change', (e) => {
+                    const val = parseInt(e.target.value);
+                    if (isNaN(val) || val < 0 || val > 100) {
+                        showMessage('نمبرات 0 سے 100 کے درمیان ہونے چاہئیں', 'warning');
+                        e.target.value = '';
+                        calculateTotals();
+                    }
+                    autoSaveData(); // Auto-save on marks change
+                });
+                newCell.appendChild(input);
+
+                // Insert before total columns (last two cells)
+                const totalCol = row.querySelector('.marks-total').closest('td');
+                row.insertBefore(newCell, totalCol);
+            });
+            addAddStudentRowToTables(); // Update colspan for add student row
+            calculateTotals();
+            autoSaveData(); // Auto-save after column change
+            elements.newSubjectName.value = '';
+            showMessage(`مضمون "${subjectName}" کامیابی سے شامل ہو گیا!`, 'success');
+        }
+
+        function removeLastSubjectColumn() {
+            const currentSubjects = Array.from(elements.dynamicMarksHeaders.querySelectorAll('.subject-name-header'));
+            if (currentSubjects.length === 0) {
+                showMessage('حذف کرنے کے لیے کوئی مضمون کالم نہیں ہے۔', 'warning');
+                return;
+            }
+
+            if (!confirm('کیا آپ واقعی آخری مضمون کالم حذف کرنا چاہتے ہیں؟')) return;
+
+            const lastSubjectHeader = currentSubjects[currentSubjects.length - 1];
+            lastSubjectHeader.remove();
+
+            elements.marksTableBody.querySelectorAll('tr[data-id]').forEach(row => {
+                const marksCells = row.querySelectorAll('.marks-cell');
+                if (marksCells.length > 0) {
+                    marksCells[marksCells.length - 1].remove();
+                }
+            });
+
+            const newSubjects = Array.from(elements.dynamicMarksHeaders.querySelectorAll('.subject-name-header')).map(th => th.textContent);
+            renderMarksTableHeaders(newSubjects); // Update colspan
+            addAddStudentRowToTables(); // Update colspan for add student row
+            calculateTotals();
+            autoSaveData(); // Auto-save after column change
+            showMessage('آخری مضمون کالم کامیابی سے ہٹا دیا گیا!', 'success');
+        }
+
+        function updateAttendanceSymbols(shouldAutoSave = true) {
+            const selectedSet = elements.attendanceSymbolsSelector.value;
+            currentAttendanceSymbols = ATTENDANCE_SYMBOL_SETS[selectedSet].symbols;
+            currentAttendanceClasses = ATTENDANCE_SYMBOL_SETS[selectedSet].classes;
+
+            // Re-render existing attendance cells with new symbols and classes
+            elements.attendanceGridBody.querySelectorAll('.attendance-grid-row').forEach(row => {
+                row.querySelectorAll('.attendance-grid-cell').forEach(cell => {
+                    const currentSymbol = cell.textContent;
+                    // Find the index of the current symbol in the *old* set
+                    const oldSetSymbols = ATTENDANCE_SYMBOL_SETS[elements.attendanceSymbolsSelector.dataset.previousValue || 'slash_x'].symbols;
+                    const symbolIndex = oldSetSymbols.indexOf(currentSymbol);
+
+                    // Map to the new symbol set, or default to empty if not found
+                    const newSymbol = currentAttendanceSymbols[symbolIndex] || '';
+                    cell.textContent = newSymbol;
+                    cell.className = 'attendance-grid-cell ' + (currentAttendanceClasses[newSymbol] || '');
+                });
+            });
+            elements.attendanceSymbolsSelector.dataset.previousValue = selectedSet; // Store for next update
+            captureState(); // Capture state after symbol change
+            if (shouldAutoSave) {
+                autoSaveData(); // Auto-save after symbol set change
+                showMessage('حاضری کے نشانات تبدیل کر دیے گئے!', 'info');
+            }
+        }
+
+        // Keyboard Navigation
+        function setupKeyboardNavigation() {
+            document.addEventListener('keydown', (e) => {
+                const activeElement = document.activeElement;
+                const isAttendanceCell = activeElement.classList.contains('attendance-grid-cell');
+                const isMarksInput = activeElement.closest('.marks-cell');
+                const isStudentInfoInput = activeElement.closest('.student-roll-col') || activeElement.closest('.student-name-col');
+
+                if (activeElement && (isAttendanceCell || isMarksInput || isStudentInfoInput)) {
+                    let currentElementsInRow = [];
+                    let currentRow = null;
+                    let allRows = [];
+                    let currentElementIndex = -1;
+
+                    if (isAttendanceCell) {
+                        currentRow = activeElement.closest('.attendance-grid-row');
+                        allRows = Array.from(elements.attendanceGridBody.querySelectorAll('.attendance-grid-row'));
+                        currentElementsInRow = Array.from(currentRow.querySelectorAll('.attendance-grid-cell'));
+                        currentElementIndex = currentElementsInRow.indexOf(activeElement);
+                    } else if (isMarksInput || isStudentInfoInput) {
+                        currentRow = activeElement.closest('tr[data-id]');
+                        allRows = Array.from(elements.marksTableBody.querySelectorAll('tr[data-id]'));
+                        currentElementsInRow = Array.from(currentRow.querySelectorAll('.student-roll-col input, .student-name-col input, .marks-cell input'));
+                        currentElementIndex = currentElementsInRow.indexOf(activeElement);
+                    } else {
+                        return; // Not a navigable element we care about
+                    }
+
+                    const currentRowIndex = allRows.indexOf(currentRow);
+                    let nextElement = null;
+
+                    if (e.key === 'ArrowRight') {
+                        nextElement = currentElementsInRow[currentElementIndex + 1];
+                    } else if (e.key === 'ArrowLeft') {
+                        nextElement = currentElementsInRow[currentElementIndex - 1];
+                    } else if (e.key === 'ArrowDown') {
+                        if (currentRowIndex < allRows.length - 1) {
+                            const nextRow = allRows[currentRowIndex + 1];
+                            nextElement = Array.from(nextRow.querySelectorAll(isAttendanceCell ? '.attendance-grid-cell' : '.student-roll-col input, .student-name-col input, .marks-cell input'))[currentElementIndex];
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        if (currentRowIndex > 0) {
+                            const prevRow = allRows[currentRowIndex - 1];
+                            nextElement = Array.from(prevRow.querySelectorAll(isAttendanceCell ? '.attendance-grid-cell' : '.student-roll-col input, .student-name-col input, .marks-cell input'))[currentElementIndex];
+                        }
+                    } else if (e.key === 'Enter' || e.key === 'Tab') {
+                        e.preventDefault(); // Prevent default tab behavior
+                        nextElement = currentElementsInRow[currentElementIndex + 1];
+                        if (!nextElement) {
+                            // If at the end of the row, go to the first input of the next row
+                            if (currentRowIndex < allRows.length - 1) {
+                                const nextRow = allRows[currentRowIndex + 1];
+                                nextElement = Array.from(nextRow.querySelectorAll(isAttendanceCell ? '.attendance-grid-cell' : '.student-roll-col input, .student-name-col input, .marks-cell input'))[0];
+                            } else {
+                                // If at the last input of the last student row, focus on new student roll
+                                elements.newStudentRollMarks.focus(); // Always focus on marks table add row
+                            }
+                        }
+                    }
+
+                    if (nextElement) {
+                        if (nextElement.tagName === 'INPUT') {
+                            nextElement.focus();
+                            nextElement.select(); // Select text for easy overwrite
+                        } else if (nextElement.classList.contains('attendance-grid-cell')) {
+                            nextElement.focus(); // Divs can be focused
+                        }
+                    }
+                }
+            });
+        }
+
+        // Tab and Collapsible Logic
+        function setupTabs() {
+            elements.tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+
+                    elements.tabButtons.forEach(btn => btn.classList.remove('active'));
+                    elements.tabContents.forEach(content => content.classList.remove('active'));
+
+                    button.classList.add('active');
+                    document.getElementById(`${tabId}TabContent`).classList.add('active');
+                });
+            });
+        }
+
+        function setupCollapsibles() {
+            elements.collapsibleHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const contentId = header.dataset.collapsible + 'Collapsible';
+                    const content = document.getElementById(contentId);
+
+                    header.classList.toggle('active');
+                    if (content.classList.contains('show')) {
+                        content.style.maxHeight = null; // Reset max-height for smooth collapse
+                        content.classList.remove('show');
+                    } else {
+                        content.classList.add('show');
+                        content.style.maxHeight = content.scrollHeight + "px"; // Set max-height to content height
+                    }
+                });
+            });
+        }
+
+        // Initial Load and Event Listeners
+        document.addEventListener('DOMContentLoaded', async () => {
+            await openDB();
+
+            // Setup UI elements
+            setupTabs();
+            setupCollapsibles();
+
+            // Populate attendance symbol selector options
+            for (const key in ATTENDANCE_SYMBOL_SETS) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = ATTENDANCE_SYMBOL_SETS[key].symbols.join(' , ');
+                elements.attendanceSymbolsSelector.appendChild(option);
+            }
+
+            // Load last selected attendance symbol set
+            const lastSymbolSet = await getMetadata('lastAttendanceSymbolSet');
+            if (lastSymbolSet && ATTENDANCE_SYMBOL_SETS[lastSymbolSet]) {
+                elements.attendanceSymbolsSelector.value = lastSymbolSet;
+            }
+            updateAttendanceSymbols(false); // Apply initial or loaded symbol set, don't auto-save on load
+
+            await populateMonthSelector(); // This will trigger loading of registers and initial state
+            addAddStudentRowToTables(); // Ensure the add student row is always present
+
+            // Event Listeners for Header Info (Auto-save)
+            elements.schoolName.addEventListener('input', autoSaveData);
+            elements.className.addEventListener('input', autoSaveData);
+            elements.sectionName.addEventListener('input', autoSaveData);
+            elements.teacherName.addEventListener('input', autoSaveData);
+
+            // Event Listeners for Monthly Controls
+            elements.monthYearSelector.addEventListener('change', async (event) => {
+                currentMonthId = event.target.value;
+                await saveMetadata('lastActiveMonth', currentMonthId);
+                await populateRegisterSelector();
+                autoSaveData(); // Auto-save after month change
+            });
+            elements.newMonthBtn.addEventListener('click', handleNewMonth);
+            elements.deleteMonthBtn.addEventListener('click', handleDeleteMonth);
+
+            // Event Listeners for Register Controls
+            elements.registerSelector.addEventListener('change', async (event) => {
+                await loadCurrentRegister(event.target.value);
+                autoSaveData(); // Auto-save after register change
+            });
+            elements.newRegisterBtn.addEventListener('click', handleNewRegister);
+            elements.deleteRegisterBtn.addEventListener('click', handleDeleteRegister);
+            elements.saveRegisterBtn.addEventListener('click', saveCurrentRegisterData); // Manual save button
+            elements.printRegisterBtn.addEventListener('click', printRegister);
+            elements.resetRegisterBtn.addEventListener('click', resetRegister);
+
+            // Event Listeners for Undo/Redo
+            elements.undoBtn.addEventListener('click', undo);
+            elements.redoBtn.addEventListener('click', redo);
+
+            // Event Listeners for Logo
+            elements.logoInput.addEventListener('change', handleLogoUpload);
+            elements.removeLogoBtn.addEventListener('click', removeLogo);
+
+            // Event Listeners for Dynamic Columns
+            elements.addAttendanceColBtn.addEventListener('click', addAttendanceColumn);
+            elements.removeLastAttendanceColBtn.addEventListener('click', removeLastAttendanceColumn);
+            elements.addSubjectColBtn.addEventListener('click', addSubjectColumn);
+            elements.removeLastSubjectColBtn.addEventListener('click', removeLastSubjectColBtn);
+
+            // Event Listener for Attendance Symbol Selector
+            elements.attendanceSymbolsSelector.addEventListener('change', updateAttendanceSymbols);
+            elements.attendanceSymbolsSelector.dataset.previousValue = elements.attendanceSymbolsSelector.value; // Initialize previous value
+
+            setupKeyboardNavigation();
+        });
+    </script>
+</body>
+</html>
