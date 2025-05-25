@@ -1699,63 +1699,66 @@
         }
 
         // Update Marks for a Cell and Re-calculate Row Totals/Grade
-        async function um1(stdId, sub, asm, score) {
-            console.log('um1 called with:', {stdId, sub, asm, score});
+        // Update Marks for a Cell and Re-calculate Row Totals/Grade
+async function um1(stdId, sub, asm, score) {
+    console.log('um1 called with:', {stdId, sub, asm, score});
 
-            const cleanScore = score.trim();
-            const num = parseFloat(cleanScore);
-            console.log('Clean score:', cleanScore, 'Parsed num:', num);
+    const cleanScore = score.trim();
+    const num = parseFloat(cleanScore);
+    console.log('Clean score:', cleanScore, 'Parsed num:', num);
 
-            // Validate score if not empty
-            if (cleanScore !== '' && (isNaN(num) || num < 0 || num > 100)) {
-                sh4('Invalid score (must be 0-100 or empty)', 'error');
-                 // Revert the cell text to the last valid score or empty
-                 const lastValidScore = st2.mrks[stdId]?.[sub]?.[asm] || '';
-                 const cell = document.querySelector(`td.marks-cell[data-std="${stdId}"][data-sub="${sub}"][data-asm="${asm}"]`);
-                 if (cell) {
-                     cell.textContent = lastValidScore;
-                      cell.style.background = 'var(--bg2)'; // Revert background
-                      cell.style.color = 'var(--txt1)'; // Revert color
-                 }
-                console.log('Validation failed, score not saved.');
-                return; // Stop if validation fails
-            }
+    // Validate score if not empty
+    if (cleanScore !== '' && (isNaN(num) || num < 0 || num > 100)) {
+        sh4('Invalid score (must be 0-100 or empty)', 'error');
+         // Revert the cell text to the last valid score or empty
+         const lastValidScore = st2.mrks[stdId]?.[sub]?.[asm] || '';
+         const cell = document.querySelector(`td.marks-cell[data-std="${stdId}"][data-sub="${sub}"][data-asm="${asm}"]`);
+         if (cell) {
+             cell.textContent = lastValidScore;
+              cell.style.background = 'var(--bg2)'; // Revert background
+              cell.style.color = 'var(--txt1)'; // Revert color
+         }
+        console.log('Validation failed, score not saved.');
+        return; // Stop if validation fails
+    }
 
-            try {
-                if (cleanScore === '') {
-                    console.log('Deleting marks record');
-                    await dl1('mrks', [st2.id, stdId, sub, asm]);
-                    // Update in-memory state
-                    if (st2.mrks[stdId] && st2.mrks[stdId][sub]) {
-                        delete st2.mrks[stdId][sub][asm];
-                        if (Object.keys(st2.mrks[stdId][sub]).length === 0) {
-                             delete st2.mrks[stdId][sub];
-                        }
-                        if (Object.keys(st2.mrks[stdId]).length === 0) {
-                             delete st2.mrks[stdId];
-                        }
-                    }
-                     sh4('Mark cleared', 'success');
-                } else {
-                    // Update in-memory state
-                    if (!st2.mrks[stdId]) st2.mrks[stdId] = {};
-                    if (!st2.mrks[stdId][sub]) st2.mrks[stdId][sub] = {};
-                    st2.mrks[stdId][sub][asm] = num; // Save as number
-                    console.log('Saving marks record:', {regId: st2.id, stdId: stdId, sub: sub, asm: asm, score: num});
-                    await pt1('mrks', {regId: st2.id, stdId: std.id, sub: sub, asm: asm, score: num});
-                     sh4('Mark saved', 'success');
+    try {
+        if (cleanScore === '') {
+            console.log('Deleting marks record');
+            await dl1('mrks', [st2.id, stdId, sub, asm]);
+            // Update in-memory state
+            if (st2.mrks[stdId] && st2.mrks[stdId][sub]) {
+                delete st2.mrks[stdId][sub][asm];
+                if (Object.keys(st2.mrks[stdId][sub]).length === 0) {
+                     delete st2.mrks[stdId][sub];
                 }
-
-                console.log('Database operation successful, updating calculations');
-                uc1(stdId); // Update calculations for the specific student row
-                rs1(); // Update the Students list table (which shows avg marks)
-
-            } catch (error) {
-                console.error('Error in um1:', error);
-                sh4('Error saving marks', 'error');
-                // Revert UI cell on DB error? Could be complex. Toast is sufficient for now.
+                if (Object.keys(st2.mrks[stdId]).length === 0) {
+                     delete st2.mrks[stdId];
+                }
             }
+             sh4('Mark cleared', 'success');
+        } else {
+            // Update in-memory state
+            if (!st2.mrks[stdId]) st2.mrks[stdId] = {};
+            if (!st2.mrks[stdId][sub]) st2.mrks[stdId][sub] = {};
+            st2.mrks[stdId][sub][asm] = num; // Save as number
+            console.log('Saving marks record:', {regId: st2.id, stdId: stdId, sub: sub, asm: asm, score: num});
+            // FIX: Use stdId argument directly instead of std.id
+            await pt1('mrks', {regId: st2.id, stdId: stdId, sub: sub, asm: asm, score: num});
+             sh4('Mark saved', 'success');
         }
+
+        console.log('Database operation successful, updating calculations');
+        uc1(stdId); // Update calculations for the specific student row
+        rs1(); // Update the Students list table (which shows avg marks)
+
+    } catch (error) {
+        console.error('Error in um1:', error);
+        sh4('Error saving marks', 'error');
+        // Revert UI cell on DB error? Could be complex. Toast is sufficient for now.
+    }
+}
+
 
         // Update Calculated Cells (Total, %, Grade) for a Specific Student Row
         function uc1(stdId) {

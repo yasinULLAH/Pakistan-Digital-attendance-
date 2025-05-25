@@ -259,7 +259,6 @@
 
         .table-container {
             overflow: auto;
-            max-height: 70vh;
             border: 1px solid var(--border1);
             border-radius: 8px;
         }
@@ -1088,22 +1087,29 @@
             document.getElementById(tab).classList.add('active');
         }
 
-   function ra1() {
+function ra1() {
+    console.log("Rendering attendance table...");
     const head = document.getElementById('attendance-head');
     const body = document.getElementById('attendance-body');
+     if (!head || !body) { console.warn("Attendance table elements not found."); return; }
+
+    // Clear existing table head and body
     head.innerHTML = '<tr><th class="sticky">Roll</th><th class="sticky sticky-2">Name</th></tr>';
     body.innerHTML = '';
 
     const days = dm1(st2.year, st2.month);
     const today = fd1(new Date());
+    // Define display styles for attendance statuses
     const styles = {
         'PA': {P: 'P', A: 'A', L: 'L', S: 'S', H: 'H', '': ''},
         'tick': {P: '✓', A: '✗', L: 'L', S: 'S', H: 'H', '': ''},
-        'arrow': {P: '↑', A: '↓', L: '→', S: '↙', H: '⌂', '': ''}
+        'arrow': {P: '↑', A: '↓', L: '→', S: '↙', H: '⌂', '': ''},
+        'emoji': {P: '😊', A: '😠', L: '🚶', S: '😴', H: '🏥', '': ''} // Added emoji style
     };
-    const style = styles[st2.sets.style];
+    const style = styles[st2.sets.style] || styles['PA']; // Default to PA if style is missing/invalid
 
     const headerRow = head.querySelector('tr');
+    // Add date headers and bulk action buttons for each day of the month
     for (let day = 1; day <= days; day++) {
         const date = fd1(new Date(st2.year, st2.month, day));
         const th = document.createElement('th');
@@ -1111,66 +1117,75 @@
             <div class="date-controls">
                 <span>${day}</span>
                 <div class="bulk-controls">
-                    <button onclick="bp1('${date}')" title="Present">P</button>
-                    <button onclick="ba1('${date}')" title="Absent">A</button>
-                    <button onclick="bc1('${date}')" title="Clear">×</button>
+                    <button class="btn btn-sm" onclick="bp1('${date}')" title="Mark Present">P</button>
+                    <button class="btn btn-sm" onclick="ba1('${date}')" title="Mark Absent">A</button>
+                    <button class="btn btn-sm btn-danger" onclick="bc1('${date}')" title="Clear">×</button>
                 </div>
             </div>
         `;
         headerRow.appendChild(th);
     }
-    headerRow.innerHTML += '<th class="sticky">Total</th><th class="sticky">%</th>';
+    // Add headers for Total and Percentage columns - ADD CLASSES HERE
+    headerRow.innerHTML += '<th class="sticky total-cell-header">Total</th><th class="sticky percent-cell-header">%</th>';
 
-    st2.stds.forEach(std => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td class="sticky">${std.roll}</td><td class="sticky sticky-2">${std.name}</td>`;
 
-        let present = 0, total = 0;
-        for (let day = 1; day <= days; day++) {
-            const date = fd1(new Date(st2.year, st2.month, day));
-            const td = document.createElement('td');
-            td.className = 'attendance-cell';
-            if (date === today) td.classList.add('today');
-            
-            const status = st2.att[std.id]?.[date] || '';
-            td.textContent = style[status] || status;
-            
-            td.setAttribute('data-std-id', std.id);
-            td.setAttribute('data-date', date);
-            
-            td.addEventListener('click', function(e) {
-                console.log('Cell clicked!', {
-                    student: std.name,
-                    stdId: std.id,
-                    date: date,
-                    currentStatus: status,
-                    cell: this
-                });
-                e.preventDefault();
-                e.stopPropagation();
-                ta1(std.id, date, this);
-            });
-            
-            tr.appendChild(td);
+    if (!st2.stds || st2.stds.length === 0) {
+        body.innerHTML = '<tr><td colspan="100%" style="text-align: center; padding: 2rem;">Add students to view attendance</td></tr>';
+        console.log("No students to render attendance table.");
+    } else {
+        // Render a row for each student
+        st2.stds.forEach(std => {
+            const tr = document.createElement('tr');
+            // --- ADD THIS LINE: Add data attribute to identify the row by student ID ---
+            tr.setAttribute('data-std', std.id);
 
-            if (status) total++;
-            if (status === 'P') present++;
-        }
+            tr.innerHTML = `<td class="sticky">${std.roll}</td><td class="sticky sticky-2">${std.name}</td>`;
 
-        const percent = total > 0 ? ((present / total) * 100).toFixed(1) : '0.0';
-        tr.innerHTML += `
-            <td class="sticky">${present}/${total}</td>
-            <td class="sticky ${parseFloat(percent) < 75 ? 'low-attendance' : ''}">${percent}%</td>
-        `;
-        body.appendChild(tr);
-    });
+            let present = 0, total = 0; // total counts days with *any* status marked this month
+            // Add attendance cells for each day of the month
+            for (let day = 1; day <= days; day++) {
+                const date = fd1(new Date(st2.year, st2.month, day));
+                const td = document.createElement('td');
+                td.className = 'attendance-cell';
+                // Highlight today's column
+                if (date === today) td.classList.add('today');
 
+                // Get the status from the in-memory state for the current student and date
+                const status = st2.att[std.id]?.[date] || '';
+                td.textContent = style[status] || status; // Set the display text based on status and style
+
+                // Add data attributes to the cell to easily identify the student and date on click
+                td.setAttribute('data-std-id', std.id);
+                td.setAttribute('data-date', date);
+
+                tr.appendChild(td);
+
+                // Calculate total and present count for this student for the current month view
+                if (status !== '') total++; // Count any marked status
+                if (status === 'P') present++;
+            }
+
+            // Calculate percentage based on marked days this month
+            const percent = total > 0 ? ((present / total) * 100).toFixed(1) : '0.0';
+            // Append the calculated Total and Percentage cells - ADD CLASSES HERE
+            tr.innerHTML += `
+                <td class="sticky total-cell">${present}/${total}</td> <!-- ADD CLASS -->
+                <td class="sticky percent-cell ${parseFloat(percent) < 75 ? 'low-attendance' : ''}">${percent}%</td> <!-- ADD CLASS -->
+            `;
+            body.appendChild(tr); // Add the completed row to the table body
+        });
+    }
+
+    // Ensure the delegated click handler is active on the table
     const table = document.getElementById('attendance-table');
     if (table) {
+         // Remove any existing handler to prevent duplicates before adding it again
         table.removeEventListener('click', handleCellClick);
         table.addEventListener('click', handleCellClick);
     }
+    console.log("Attendance table rendered.");
 }
+
 
 function handleCellClick(e) {
     if (e.target.classList.contains('attendance-cell')) {
@@ -1365,31 +1380,35 @@ function rm1() {
         // Fix for attendance cell clicking
 async function ta1(stdId, date, cell) {
     console.log('ta1 called with:', {stdId, date, cell});
-    console.log('st2.att before:', st2.att[stdId]?.[date]);
-    
+
+    // Define possible statuses and their display styles
     const statuses = ['', 'P', 'A', 'L', 'S', 'H'];
     const styles = {
         'PA': {P: 'P', A: 'A', L: 'L', S: 'S', H: 'H', '': ''},
         'tick': {P: '✓', A: '✗', L: 'L', S: 'S', H: 'H', '': ''},
-        'arrow': {P: '↑', A: '↓', L: '→', S: '↙', H: '⌂', '': ''}
+        'arrow': {P: '↑', A: '↓', L: '→', S: '↙', H: '⌂', '': ''},
+        'emoji': {P: '😊', A: '😠', L: '🚶', S: '😴', H: '🏥', '': ''}
     };
-    
+
+    // Get the current status and determine the next status in the cycle
     const current = st2.att[stdId]?.[date] || '';
     const currentIndex = statuses.indexOf(current);
     const newIndex = (currentIndex + 1) % statuses.length;
     const newStatus = statuses[newIndex];
-    
+
     console.log('Status change:', {current, currentIndex, newIndex, newStatus});
 
+    // Update the in-memory state *before* saving to DB
     if (!st2.att[stdId]) st2.att[stdId] = {};
     st2.att[stdId][date] = newStatus;
 
+    // Update the display text of the clicked cell immediately
     const style = styles[st2.sets.style] || styles['PA'];
     cell.textContent = style[newStatus] || newStatus;
-    
-    console.log('Cell text updated to:', cell.textContent);
+
 
     try {
+        // Save the change to IndexedDB
         if (newStatus === '') {
             console.log('Deleting attendance record');
             await dl1('att', [st2.id, stdId, date]);
@@ -1398,57 +1417,344 @@ async function ta1(stdId, date, cell) {
             await pt1('att', {regId: st2.id, stdId: stdId, date: date, status: newStatus});
         }
         console.log('Database operation successful');
+
+        // --- FIX START: Update only the specific row and main stats ---
+
+        // Find the student's row in the attendance table using the data-std attribute
+        // (Ensure data-std attribute is added to <tr> in ra1 function)
+        const studentRow = document.querySelector(`#attendance-table tbody tr[data-std="${stdId}"]`);
+        if (studentRow) {
+            console.log("Found student row to update:", studentRow);
+            // Recalculate totals and percentage for this student using the updated st2.att
+            let present = 0;
+            let total = 0; // Total days with *any* status marked in the current month view
+            const daysInMonth = dm1(st2.year, st2.month);
+            const studentMonthAtt = st2.att[stdId] || {}; // Get the attendance data for this student this month
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                 const dateKey = fd1(new Date(st2.year, st2.month, day));
+                 const status = studentMonthAtt[dateKey] || '';
+                 if (status !== '') total++; // Count any marked status for the total marked days this month
+                 if (status === 'P') present++;
+            }
+
+            const percent = total > 0 ? ((present / total) * 100).toFixed(1) : '0.0';
+
+            // Find the Total and % cells in this specific row using their classes (ensure classes are added in ra1)
+            const totalCell = studentRow.querySelector('.total-cell');
+            const percentCell = studentRow.querySelector('.percent-cell');
+
+            if (totalCell) {
+                 totalCell.textContent = `${present}/${total}`;
+                 console.log('Updated row total cell');
+            }
+            if (percentCell) {
+                 percentCell.textContent = `${percent}%`;
+                 // Update the CSS class based on the new percentage
+                 percentCell.classList.toggle('low-attendance', parseFloat(percent) < 75);
+                 console.log('Updated row percent cell');
+            }
+
+        } else {
+             console.warn("Student row not found in attendance table for updating calculations:", stdId);
+             // If for some reason the specific row isn't found (shouldn't happen if ra1 works),
+             // you might fall back to re-rendering the whole table, but it's less efficient.
+             // ra1(); // Fallback: Re-render the whole table
+        }
+
+        up1(); // Update the main statistics block (#stats)
+
+        // --- FIX END ---
+
     } catch (error) {
         console.error('Database operation failed:', error);
+        sh4('Error saving attendance', 'error');
+        // Revert the UI change and in-memory state if the DB save fails
+        const originalStatus = statuses[(currentIndex) % statuses.length]; // Get the status before the click
+        cell.textContent = style[originalStatus] || originalStatus; // Revert cell text
+        st2.att[stdId][date] = originalStatus; // Revert in memory state
+
+         // Also revert the row calculations display if they were updated before the catch
+         const studentRow = document.querySelector(`#attendance-table tbody tr[data-std="${stdId}"]`);
+         if (studentRow) {
+             let present = 0;
+             let total = 0;
+             const daysInMonth = dm1(st2.year, st2.month);
+             const studentMonthAtt = st2.att[stdId] || {}; // st2.att is already reverted here
+
+              for (let day = 1; day <= daysInMonth; day++) {
+                  const dateKey = fd1(new Date(st2.year, st2.month, day));
+                  const status = studentMonthAtt[dateKey] || '';
+                  if (status !== '') total++;
+                  if (status === 'P') present++;
+             }
+             const percent = total > 0 ? ((present / total) * 100).toFixed(1) : '0.0';
+              const totalCell = studentRow.querySelector('.total-cell');
+              const percentCell = studentRow.querySelector('.percent-cell');
+               if (totalCell) totalCell.textContent = `${present}/${total}`;
+               if (percentCell) {
+                   percentCell.textContent = `${percent}%`;
+                   percentCell.classList.toggle('low-attendance', parseFloat(percent) < 75);
+               }
+          }
     }
 
-    up1();
     console.log('ta1 completed');
 }
 
 
+// Update Marks for a Cell and Re-calculate Row Totals/Grade
+// Added stdName and stdRoll parameters for improved logging/messaging within the function
+async function um1(stdId, sub, asm, score, stdName, stdRoll) {
+    console.log('um1 called for', stdName, '(Roll', stdRoll, ') with:', {stdId, sub, asm, score});
 
-async function um1(stdId, sub, asm, score) {
-    console.log('um1 called with:', {stdId, sub, asm, score});
-    
     const cleanScore = score.trim();
-    console.log('Clean score:', cleanScore);
-    
+    const num = parseFloat(cleanScore);
+    console.log('Clean score:', cleanScore, 'Parsed num:', num);
+
+    // Validate score if not empty
+    if (cleanScore !== '' && (isNaN(num) || num < 0 || num > 100)) {
+        sh4('Invalid score (must be 0-100 or empty)', 'error');
+         // Revert the cell text to the last valid score or empty from memory
+         const lastValidScore = st2.mrks[stdId]?.[sub]?.[asm] || '';
+         const cell = document.querySelector(`td.marks-cell[data-std="${stdId}"][data-sub="${sub}"][data-asm="${asm}"]`);
+         if (cell) {
+             cell.textContent = lastValidScore;
+              // Also revert background/color visually
+              cell.style.background = 'var(--bg2)';
+              cell.style.color = 'var(--txt1)';
+         }
+        console.log('Validation failed, score not saved.');
+        return; // Stop if validation fails
+    }
+
     try {
         if (cleanScore === '') {
-            console.log('Deleting marks record');
+            console.log(`Deleting mark for ${stdName} (${sub} ${asm})`);
             await dl1('mrks', [st2.id, stdId, sub, asm]);
+            // Update in-memory state
             if (st2.mrks[stdId] && st2.mrks[stdId][sub]) {
                 delete st2.mrks[stdId][sub][asm];
+                if (Object.keys(st2.mrks[stdId][sub]).length === 0) {
+                     delete st2.mrks[stdId][sub];
+                }
+                if (Object.keys(st2.mrks[stdId]).length === 0) {
+                     delete st2.mrks[stdId];
+                }
             }
+             sh4(`Mark cleared for ${stdName}`, 'success');
         } else {
-            const num = parseFloat(cleanScore);
-            console.log('Parsed number:', num);
-            
-            if (isNaN(num) || num < 0 || num > 100) {
-                console.log('Invalid score detected');
-                sh4('Invalid score (0-100)', 'error');
-                return;
-            }
-            
+            // Update in-memory state
             if (!st2.mrks[stdId]) st2.mrks[stdId] = {};
             if (!st2.mrks[stdId][sub]) st2.mrks[stdId][sub] = {};
-            st2.mrks[stdId][sub][asm] = num;
-            
-            console.log('Saving marks record:', {regId: st2.id, stdId: stdId, sub: sub, asm: asm, score: num});
+            st2.mrks[stdId][sub][asm] = num; // Save as number
+            console.log(`Saving mark for ${stdName} (${sub} ${asm}): ${num}`);
+            // Use stdId argument here, not the std variable from the outer scope
             await pt1('mrks', {regId: st2.id, stdId: stdId, sub: sub, asm: asm, score: num});
+             sh4(`Mark saved for ${stdName}`, 'success');
         }
-        
-        console.log('Database operation successful, updating calculations');
-        uc1(stdId);
+
+        console.log('Database operation successful, updating tables');
+
+        // Re-render the entire marks table (rm1) to ensure totals/grades are refreshed.
+        rm1();
+
+        // Update the Students list table (which shows avg marks)
         rs1();
-        
+
     } catch (error) {
-        console.error('Error in um1:', error);
-        sh4('Error saving marks', 'error');
+        console.error('Error in um1 for', stdName, ':', error);
+        sh4(`Error saving mark for ${stdName}`, 'error');
+        // Consider reverting UI cell here on DB save error if needed
+         const cell = document.querySelector(`td.marks-cell[data-std="${stdId}"][data-sub="${sub}"][data-asm="${asm}"]`);
+         if (cell) {
+              const lastValidScore = st2.mrks[stdId]?.[sub]?.[asm] || ''; // Revert to the value still in memory
+              cell.textContent = lastValidScore;
+              cell.style.background = 'var(--bg2)';
+              cell.style.color = 'var(--txt1)';
+         }
     }
 }
 
+
+// --- MODIFICATION NEEDED IN rm1 ---
+// Update the blur event listener call within the rm1 function
+// to pass std.name and std.roll to um1.
+
+function rm1() {
+    console.log("Rendering marks table...");
+    const head = document.getElementById('marks-head');
+    const body = document.getElementById('marks-body');
+
+    if (!head || !body) { console.warn("Marks table elements not found."); return; }
+
+    head.innerHTML = '<tr><th class="sticky">Roll</th><th class="sticky sticky-2">Name</th></tr>';
+    body.innerHTML = '';
+
+    if (!st2.subs || st2.subs.length === 0 || !st2.asms || st2.asms.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Add subjects and assessments to display marks</td></tr>';
+         console.log("No subjects or assessments to render marks table.");
+        return;
+    }
+
+    const headerRow = head.querySelector('tr');
+    st2.subs.forEach(sub => {
+        const th = document.createElement('th');
+        th.colSpan = st2.asms.length;
+        th.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>${escapeHTML(sub)}</span>
+                <button class="btn btn-sm btn-danger" onclick="ds1('${escapeHTML(sub)}')">×</button>
+            </div>
+        `;
+        headerRow.appendChild(th);
+    });
+    headerRow.innerHTML += '<th class="sticky total-cell-header">Total</th><th class="sticky percent-cell-header">%</th><th class="sticky grade-cell-header">Grade</th>';
+
+    const asmRow = document.createElement('tr');
+    asmRow.innerHTML = '<th class="sticky"></th><th class="sticky sticky-2"></th>';
+    st2.subs.forEach(sub => {
+        st2.asms.forEach(asm => {
+            const th = document.createElement('th');
+            th.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>${escapeHTML(asm)}</span>
+                    <button class="btn btn-sm btn-danger" onclick="da1('${escapeHTML(asm)}')">×</button>
+                </div>
+            `;
+            asmRow.appendChild(th);
+        });
+    });
+    asmRow.innerHTML += '<th class="sticky"></th><th class="sticky"></th><th class="sticky"></th>';
+    head.appendChild(asmRow);
+
+    if (!st2.stds || st2.stds.length === 0) {
+        body.innerHTML = '<tr><td colspan="100%" style="text-align: center; padding: 2rem;">Add students to display marks</td></tr>';
+         console.log("No students to render marks table.");
+        return;
+    }
+
+    st2.stds.forEach(std => {
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-std', std.id);
+
+        tr.innerHTML = `<td class="sticky">${std.roll}</td><td class="sticky sticky-2">${escapeHTML(std.name)}</td>`;
+
+        let total = 0, max = 0; // These variables are used to calculate total/max for the row being built
+        st2.subs.forEach(sub => {
+            st2.asms.forEach(asm => {
+                const td = document.createElement('td');
+                td.className = 'marks-cell';
+                td.contentEditable = true;
+                td.setAttribute('spellcheck', 'false');
+                const score = st2.mrks[std.id]?.[sub]?.[asm]; // Get score from state
+                const scoreDisplay = score !== undefined && score !== null ? score : ''; // Display empty for undefined/null
+                td.textContent = scoreDisplay;
+                td.setAttribute('data-std', std.id);
+                td.setAttribute('data-sub', sub);
+                td.setAttribute('data-asm', asm);
+
+                let originalValue = scoreDisplay; // Store original value on focus
+
+                td.addEventListener('focus', function() {
+                    originalValue = this.textContent;
+                    this.style.background = 'var(--bg1)';
+                    this.style.color = 'var(--txt1)';
+                    console.log('Focus on marks cell:', {std: std.name, sub, asm, value: originalValue});
+                });
+
+                td.addEventListener('blur', function() {
+                    const newValue = this.textContent.trim();
+                    if (newValue !== originalValue) {
+                        console.log('Marks cell changed:', {
+                            std: std.name,
+                            sub,
+                            asm,
+                            oldValue: originalValue,
+                            newValue: newValue
+                        });
+                        // --- FIX: Pass std.name and std.roll to um1 ---
+                        um1(std.id, sub, asm, newValue, std.name, std.roll);
+                        // --- END FIX ---
+                    }
+                    // Revert background/color if blur happens without valid input or change
+                    const val = this.textContent.trim();
+                    const num = parseFloat(val);
+                   if (val !== '' && (isNaN(num) || num < 0 || num > 100)) {
+                        this.style.background = 'var(--danger)';
+                        this.style.color = 'white';
+                    } else {
+                        this.style.background = 'var(--bg2)';
+                        this.style.color = 'var(--txt1)';
+                    }
+                });
+
+                td.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Prevent new line
+                        this.blur(); // Trigger blur to save/update
+                    }
+                });
+
+                td.addEventListener('input', function() {
+                    const val = this.textContent.trim();
+                    const num = parseFloat(val);
+                    if (val === '' || (!isNaN(num) && num >= 0 && num <= 100)) {
+                        this.style.background = 'var(--bg1)';
+                        this.style.color = 'var(--txt1)';
+                    } else {
+                        this.style.background = 'var(--danger)';
+                        this.style.color = 'white';
+                    }
+                });
+
+                tr.appendChild(td);
+
+                // Calculate total and max for this row while rendering
+                const num = parseFloat(score);
+                if (!isNaN(num) && num >= 0) {
+                    total += num;
+                    max += 100;
+                }
+            });
+        });
+
+        const percent = max > 0 ? ((total / max) * 100).toFixed(1) : '0.0';
+        const grade = gr1(percent);
+
+        // Append calculated cells
+        const totalTd = document.createElement('td');
+        totalTd.className = 'sticky total-cell';
+        totalTd.textContent = total;
+        tr.appendChild(totalTd);
+
+        const percentTd = document.createElement('td');
+        percentTd.className = `sticky percent-cell ${parseFloat(percent) < 50 ? 'failing' : ''}`;
+        percentTd.textContent = percent + '%';
+        tr.appendChild(percentTd);
+
+        const gradeTd = document.createElement('td');
+        gradeTd.className = `sticky grade-cell ${grade === 'F' ? 'failing' : ''}`;
+        gradeTd.textContent = grade;
+        tr.appendChild(gradeTd);
+
+        body.appendChild(tr);
+    });
+
+    console.log('Marks table rendered with', st2.stds.length, 'students');
+}
+
+
+// The uc1 function is no longer called by um1 directly,
+// but it's kept in case it's used elsewhere or for future expansion.
+// The fix for this specific issue is the change in um1 and rm1's event listener.
+/*
+function uc1(stdId) {
+    // ... uc1 implementation ...
+}
+*/
+
+// The rest of the code remains unchanged.
 
 function dbg1() {
     console.log('=== DEBUG INFO ===');
