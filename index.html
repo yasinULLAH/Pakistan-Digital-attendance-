@@ -2146,7 +2146,7 @@
             const name = prompt('نیا رجسٹر کا نام:');
             if (name && name.trim()) {
                 const transaction = db1.transaction(['registers'], 'readwrite');
-                transaction.objectStore('registers').put({name: name.trim()});
+                transaction.objectStore('registers').put({ id: name.trim(), name: name.trim() });
                 loadRegisters();
                 switchRegister(name.trim());
                 showNotification('نیا رجسٹر بنا دیا گیا', 'success');
