@@ -112,7 +112,7 @@
         
         .register-table th, .register-table td {
             border: 1px solid #dee2e6;
-            padding: 8px;
+            padding: 4px;
             text-align: center;
             position: relative;
         }
@@ -390,6 +390,10 @@
             .btn { padding: 12px; font-size: 13px; }
             .stats-grid { grid-template-columns: 1fr; }
         }
+
+#marksTable thead tr:first-child th:not(:first-child):not(:nth-last-child(-n+4)) {
+    padding-left: 1.5rem;
+}
     </style>
 </head>
 <body>
@@ -1212,84 +1216,152 @@
             }
         }
 
-        function renderMarksTable() {
-            const tbody = document.getElementById('marksBody');
-            const thead = document.querySelector('#marksTable thead tr');
-            
-            thead.innerHTML = `
-                <th class="student-name">طالب علم</th>
-                ${subjects10.map(subject => `<th>${subject}</th>`).join('')}
-                <th class="total-cell">کل</th>
-                <th class="total-cell">فیصد</th>
-                <th class="total-cell">گریڈ</th>
-                <th class="total-cell">نتیجہ</th>
-            `;
-            
-            tbody.innerHTML = '';
-            
-            students2.forEach((student, studentIndex) => {
-                const row = document.createElement('tr');
-                
-                const nameCell = document.createElement('td');
-                nameCell.className = 'student-name';
-                nameCell.textContent = student.name;
-                row.appendChild(nameCell);
-                
-                let total = 0;
-                
-                subjects10.forEach(subject => {
-                    const cell = document.createElement('td');
-                    cell.className = 'marks-cell';
-                    
-                    const input = document.createElement('input');
-                    input.type = 'number';
-                    input.min = '0';
-                    input.max = totalMarks12.toString();
-                    const markKey = `${studentIndex}_${subject}`;
-                    input.value = marks4[markKey] || '';
-                    
-                    input.addEventListener('input', () => {
-                        marks4[markKey] = parseInt(input.value) || 0;
-                        calculateRowMarks(row, studentIndex);
-                        calculateSubjectTotals();
-                        autoSave();
-                    });
-                    
-                    cell.appendChild(input);
-                    row.appendChild(cell);
-                    
-                    total += parseInt(input.value) || 0;
-                });
-                
-                const totalCell = document.createElement('td');
-                totalCell.className = 'total-cell';
-                totalCell.textContent = total;
-                row.appendChild(totalCell);
-                
-                const maxMarks = subjects10.length * totalMarks12;
-                const percentage = Math.round((total / maxMarks) * 100);
-                
-                const percentCell = document.createElement('td');
-                percentCell.className = 'total-cell';
-                percentCell.textContent = `${percentage}%`;
-                row.appendChild(percentCell);
-                
-                const gradeCell = document.createElement('td');
-                gradeCell.className = 'total-cell';
-                gradeCell.textContent = calculateGrade(percentage);
-                row.appendChild(gradeCell);
-                
-                const resultCell = document.createElement('td');
-                resultCell.className = 'total-cell';
-                resultCell.textContent = percentage >= passMarks11 ? 'کامیاب' : 'ناکام';
-                resultCell.style.color = percentage >= passMarks11 ? 'green' : 'red';
-                row.appendChild(resultCell);
-                
-                tbody.appendChild(row);
+        // Find your existing renderMarksTable function and replace it with this version:
+function renderMarksTable() {
+    const tbody = document.getElementById('marksBody');
+    const theadRow = document.querySelector('#marksTable thead tr');
+
+    // Clear the existing header row content
+    theadRow.innerHTML = '';
+
+    // Add the static "Student Name" header
+    const studentNameTh = document.createElement('th');
+    studentNameTh.className = 'student-name';
+    studentNameTh.textContent = 'طالب علم';
+    theadRow.appendChild(studentNameTh);
+
+    // Dynamically add subject headers with delete buttons
+    subjects10.forEach(subject => {
+        const th = document.createElement('th');
+        th.style.position = 'relative'; // Needed to position the delete button absolutely
+
+        // Add the subject name text
+        const subjectNameSpan = document.createElement('span');
+        subjectNameSpan.textContent = subject;
+        th.appendChild(subjectNameSpan);
+
+        // Add the delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = '×'; // The multiplication sign makes a good 'x'
+        deleteButton.className = 'btn btn-danger'; // Use existing btn-danger style for red color
+        // Apply inline styles to make it small, round, and positioned
+        deleteButton.style.cssText = `
+            position: absolute;
+            top: 3px; /* Adjust position as needed */
+            left: 3px; /* Adjust position as needed */
+            font-size: 10px; /* Smaller font size */
+            padding: 0 4px; /* Remove padding */
+            line-height: 1; /* Center text vertically */
+            height: 16px; /* Small height */
+            width: 16px;  /* Small width */
+            border-radius: 50%; /* Make it round */
+            cursor: pointer;
+            background: red !important; /* Ensure red background */
+            color: white !important; /* Ensure white text */
+            border: none;
+            display: flex; /* Use flex to center content */
+            align-items: center;
+            justify-content: center;
+        `;
+         // Prevent the button click from bubbling up and triggering other potential header events
+         deleteButton.onclick = (event) => {
+             event.stopPropagation(); // Stop event propagation
+             deleteSubject(subject); // Call the delete function, passing the subject name
+         };
+
+
+        th.appendChild(deleteButton);
+        theadRow.appendChild(th);
+    });
+
+    // Add the static total, percentage, grade, and result headers
+    const totalTh = document.createElement('th'); totalTh.className = 'total-cell'; totalTh.textContent = 'کل'; theadRow.appendChild(totalTh);
+    const percentTh = document.createElement('th'); percentTh.className = 'total-cell'; percentTh.textContent = 'فیصد'; theadRow.appendChild(percentTh);
+    const gradeTh = document.createElement('th'); gradeTh.className = 'total-cell'; gradeTh.textContent = 'گریڈ'; theadRow.appendChild(gradeTh);
+    const resultTh = document.createElement('th'); resultTh.className = 'total-cell'; resultTh.textContent = 'نتیجہ'; theadRow.appendChild(resultTh);
+
+    // Clear the existing table body content
+    tbody.innerHTML = '';
+
+    // Populate the table body with student data
+    students2.forEach((student, studentIndex) => {
+        const row = document.createElement('tr');
+
+        // Add the student name cell
+        const nameCell = document.createElement('td');
+        nameCell.className = 'student-name';
+        nameCell.textContent = student.name; // Assumes student name is not editable here
+        row.appendChild(nameCell);
+
+        let total = 0; // Variable to calculate the student's total marks for this row
+
+        // Add cells for each subject's marks
+        subjects10.forEach(subject => {
+            const cell = document.createElement('td');
+            cell.className = 'marks-cell';
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.max = totalMarks12.toString(); // Use the global totalMarks value
+            const markKey = `${studentIndex}_${subject}`; // Unique key for the mark
+
+            // Set the input value from the marks data, default to empty string if not found
+            input.value = marks4[markKey] !== undefined ? marks4[markKey] : '';
+
+            // Add an event listener to update marks data when the input changes
+            input.addEventListener('input', () => {
+                 // Use valueAsNumber for safer number handling, default to 0 if invalid
+                 const value = input.valueAsNumber;
+                 marks4[markKey] = isNaN(value) ? 0 : value; // Store the value (0 if NaN)
+
+                // Recalculate row totals, column totals, and save data
+                calculateRowMarks(row, studentIndex); // Update this row's totals/grade/result
+                calculateSubjectTotals(); // Update the footer totals
+                autoSave(); // Auto-save the changes
             });
-            
-            calculateSubjectTotals();
-        }
+
+            cell.appendChild(input);
+            row.appendChild(cell);
+
+             // Add the mark (as a number, default to 0) to the row total
+             total += isNaN(input.valueAsNumber) ? 0 : input.valueAsNumber;
+        });
+
+        // Add the total, percentage, grade, and result cells for the student row
+        const totalCell = document.createElement('td');
+        totalCell.className = 'total-cell';
+        totalCell.textContent = total; // Calculated above
+        row.appendChild(totalCell);
+
+        const maxMarks = subjects10.length * totalMarks12;
+        // Calculate percentage safely, handle division by zero if no subjects
+        const percentage = maxMarks > 0 ? Math.round((total / maxMarks) * 100) : 0;
+
+        const percentCell = document.createElement('td');
+        percentCell.className = 'total-cell';
+        percentCell.textContent = `${percentage}%`;
+        row.appendChild(percentCell);
+
+        const gradeCell = document.createElement('td');
+        gradeCell.className = 'total-cell';
+        gradeCell.textContent = calculateGrade(percentage); // Calculate grade based on percentage
+        row.appendChild(gradeCell);
+
+        const resultCell = document.createElement('td');
+        resultCell.className = 'total-cell';
+        const result = percentage >= passMarks11 ? 'کامیاب' : 'ناکام'; // Determine pass/fail
+        resultCell.textContent = result;
+        resultCell.style.color = percentage >= passMarks11 ? 'green' : 'red'; // Color based on result
+        row.appendChild(resultCell);
+
+        // Append the complete student row to the table body
+        tbody.appendChild(row);
+    });
+
+    // Calculate and render the footer summary row totals
+    calculateSubjectTotals();
+}
 
         function calculateRowMarks(row, studentIndex) {
             const inputs = row.querySelectorAll('input[type="number"]');
@@ -1472,7 +1544,61 @@
                 generateCharts();
             }
         }
+// Add this new function anywhere in your <script> block
+function deleteSubject(subjectName) {
+    // Optional: Add a confirmation dialog
+    if (!confirm(`کیا آپ واقعی مضمون "${subjectName}" کو ڈیلیٹ کرنا چاہتے ہیں؟ اس سے متعلقہ تمام نمبریں ضائع ہو جائیں گی۔`)) {
+        return; // User cancelled
+    }
 
+    const index = subjects10.indexOf(subjectName);
+    if (index > -1) {
+        // 1. Remove the subject from the subjects array
+        subjects10.splice(index, 1);
+
+        // 2. Remove all marks associated with this subject from the marks object
+        const marksToDelete = [];
+        for (const key in marks4) {
+            // The key format is typically ${studentIndex}_${subjectName}
+            // Check if the key ends with the subject name we are deleting
+            if (key.endsWith(`_${subjectName}`)) {
+                 marksToDelete.push(key);
+            }
+             // Handle cases where subject names might contain underscores if necessary,
+             // but the current format ${index}_${name} should be safe.
+        }
+        marksToDelete.forEach(key => {
+             delete marks4[key];
+        });
+
+
+        // 3. Update the subjects array in IndexedDB
+        // Use a transaction to save the updated subjects list
+        const transaction = db1.transaction(['subjects'], 'readwrite');
+        const subjectsStore = transaction.objectStore('subjects');
+        // Put the updated array back under the current register's key
+        subjectsStore.put({id: currentRegister6, data: subjects10});
+
+         // Also save the updated marks object (with deleted entries)
+         const marksTransaction = db1.transaction(['marks'], 'readwrite');
+         const marksStore = marksTransaction.objectStore('marks');
+         marksStore.put({id: currentRegister6, data: marks4});
+
+
+        // 4. Re-render the marks table to reflect the changes
+        renderMarksTable();
+
+        // 5. Trigger auto-save for safety (though the DB update above is more direct)
+        autoSave();
+
+        // 6. Show a success notification
+        showNotification(`مضمون "${subjectName}" ڈیلیٹ کر دیا گیا`, 'success');
+
+    } else {
+        // Show an error if the subject wasn't found (shouldn't happen if called correctly)
+        showNotification(`ایررو: مضمون "${subjectName}" نہیں ملا۔`, 'error');
+    }
+}
         function generateStats() {
             document.getElementById('totalStudents').textContent = students2.length;
             
